@@ -7,6 +7,8 @@ name = "pypi"
 django = "*"
 pip-search = "*"
 djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
 
 [dev-packages]
 

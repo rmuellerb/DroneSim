@@ -30,9 +30,9 @@ class Drone(models.Model):
     ]
     carriage_type = models.CharField(max_length=3, choices=CARRIAGE_CHOICES, default=CARRIAGE_NOTHING)
     speed = models.PositiveBigIntegerField(help_text="Current speed in km/h")
-    align_roll = models.DecimalField(max_digits=3, decimal_places=2, default=000.00, help_text="Current alignment on x-axis")
-    align_pitch = models.DecimalField(max_digits=3, decimal_places=2, default=000.00, help_text="Current algnment on y-axis")
-    align_yaw = models.DecimalField(max_digits=3, decimal_places=2, default=000.00, help_text="Current alignment on z-axis")
+    align_roll = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current alignment on x-axis")
+    align_pitch = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current algnment on y-axis")
+    align_yaw = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current alignment on z-axis")
     longitude = models.DecimalField(max_digits=9, decimal_places=6, help_text="Current position longitude with a precision of 6 decimal places")
     latitude = models.DecimalField(max_digits=9, decimal_places=6, help_text="Current position latitude with a precision of 6 decimal places")
     battery_status = models.PositiveBigIntegerField(help_text="Current battery charge in mAh")
