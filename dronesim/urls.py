@@ -18,13 +18,17 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from simulator import views
+from rest_framework.urlpatterns import format_suffix_patterns
 
 router = routers.DefaultRouter()
-router.register(r'drones', views.DroneViewSet)
+router.register(r'drones', views.DroneOverviewViewSet)
+router.register(r'dronetypes', views.DroneTypeViewSet)
 
 urlpatterns = [
         path('simulator/', include('simulator.urls')),
         path('admin/', admin.site.urls),
-        path('', include(router.urls)),
+        path('api/', include(router.urls)),
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+
+#urlpatterns = format_suffix_patterns(urlpatterns)

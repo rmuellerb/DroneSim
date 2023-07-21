@@ -2,10 +2,11 @@ from .models import Drone
 from .models import Dronetype
 from rest_framework import serializers
 
-class DronetypeSerializer(serializers.HyperlinkedModelSerializer):
+class DroneTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Dronetype
         fields = [
+                'id',
                 'manufacturer',
                 'typename',
                 'weight',
@@ -15,17 +16,22 @@ class DronetypeSerializer(serializers.HyperlinkedModelSerializer):
                 'maxcarriage',
                 ]
 
-class DroneSerializer(serializers.HyperlinkedModelSerializer):
-#    manufacturer = serializers.CharField(source='dronetype.manufacturer')
-#    typename = serializers.CharField(source='dronetype.typename')
-#    weight = serializers.PositiveBigIntegerField(source='dronetype.weight')
-#    maxspeed = serializers.PositiveIntegerField(source='dronetype.maxspeed')
+class DroneOverviewSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Drone
+        fields = [
+                'id',
+                'dronetype',
+                'serialnumber',
+                ]
 
-    dronetype = DronetypeSerializer(many=False)
+class DroneDetailsSerializer(serializers.HyperlinkedModelSerializer):
+    dronetype = DroneTypeSerializer(many=False)
 
     class Meta:
         model = Drone
         fields = [
+                'id',
                 'dronetype',
                 'serialnumber', 
                 'carriage_weight', 
