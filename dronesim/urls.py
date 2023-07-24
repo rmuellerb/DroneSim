@@ -21,7 +21,8 @@ from simulator import views
 from rest_framework.urlpatterns import format_suffix_patterns
 
 router = routers.DefaultRouter()
-router.register(r'drones', views.DroneOverviewViewSet)
+router.register(r'drones', views.DroneViewSet)
+router.register(r'dronedynamics', views.DroneDynamicsViewSet)
 router.register(r'dronetypes', views.DroneTypeViewSet)
 
 urlpatterns = [

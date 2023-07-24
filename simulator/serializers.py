@@ -1,41 +1,42 @@
 from .models import Drone
-from .models import Dronetype
+from .models import DroneType
+from .models import DroneDynamics
 from rest_framework import serializers
 
 class DroneTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Dronetype
+        model = DroneType
         fields = [
                 'id',
                 'manufacturer',
                 'typename',
                 'weight',
-                'maxspeed',
+                'max_speed',
                 'battery_capacity',
                 'control_range',
-                'maxcarriage',
+                'max_carriage'
                 ]
 
-class DroneOverviewSerializer(serializers.HyperlinkedModelSerializer):
+class DroneSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Drone
         fields = [
                 'id',
                 'dronetype',
+                'created',
                 'serialnumber',
+                'carriage_weight', 
+                'carriage_type'
                 ]
 
-class DroneDetailsSerializer(serializers.HyperlinkedModelSerializer):
-    dronetype = DroneTypeSerializer(many=False)
+class DroneDynamicsSerializer(serializers.HyperlinkedModelSerializer):
+    #drone = DroneSerializer(many=False)
 
     class Meta:
-        model = Drone
+        model = DroneDynamics
         fields = [
-                'id',
-                'dronetype',
-                'serialnumber', 
-                'carriage_weight', 
-                'carriage_type', 
+                'drone',
+                'timestamp', 
                 'speed', 
                 'align_roll', 
                 'align_pitch', 
@@ -44,5 +45,5 @@ class DroneDetailsSerializer(serializers.HyperlinkedModelSerializer):
                 'latitude', 
                 'battery_status', 
                 'last_seen', 
-                'status', 
+                'status'
                 ]
