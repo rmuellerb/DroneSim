@@ -34,5 +34,7 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
 # Create your views here.
 
 def index(request):
-    return HttpResponse("Hello Simulator")
+    drones = Drone.objects.all()
+    context = {'drones': drones}
+    return render(request, 'simulator/index.html', context)
 

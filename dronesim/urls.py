@@ -26,6 +26,7 @@ router.register(r'dronedynamics', views.DroneDynamicsViewSet)
 router.register(r'dronetypes', views.DroneTypeViewSet)
 
 urlpatterns = [
+        path('', views.index, name="index"),
         path('simulator/', include('simulator.urls')),
         path('admin/', admin.site.urls),
         path('api/', include(router.urls)),

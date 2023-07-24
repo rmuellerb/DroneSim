@@ -31,12 +31,11 @@ class Drone(models.Model):
             ]
     carriage_type = models.CharField(max_length=3, choices=CARRIAGE_CHOICES, default=CARRIAGE_NOTHING)
 
-
 class DroneDynamics(models.Model):
     def __str__(self):
-        return "[{}]: drone {}, status: {}".format(timestamp, drone, status)
-
-    drone = models.ForeignKey(Drone, on_delete=models.CASCADE)
+        return "[{}]: {}, status: {}".format(self.timestamp, self.drone, self.status)
+    
+    drone = models.ForeignKey(Drone, on_delete=models.CASCADE, related_name="dynamics")
     timestamp = models.DateTimeField(auto_now_add=True)
     speed = models.PositiveIntegerField(help_text="Current speed in km/h")
     align_roll = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current alignment on x-axis")
@@ -55,4 +54,3 @@ class DroneDynamics(models.Model):
             (STATUS_ISSUES, "Issues"),
             ]
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS_OFFLINE)
-

@@ -1,0 +1,37 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+
+<table>
+    <tr>
+        <th>Manufacturer</th>
+        <th>Typename</th>
+        <th>Serialnumber</th>
+        <th>Created</th>
+        <th>Status</th>
+        <th>Last update</th>
+    </tr>
+    {% for drone in drones %}
+    <tr>
+        <td>{{drone.dronetype.manufacturer}}</td>
+        <td>{{drone.dronetype.typename}}</td>
+        <td>{{drone.serialnumber}}</td>
+        <td>{{drone.created}}</td>
+        {% if drone.dynamics.last %}
+            <td>{{drone.dynamics.last.status}}</td>
+            <td>{{drone.dynamics.last.timestamp}}</td>
+        {% else %}
+            <td>-</td>
+            <td>-</td>
+        {% endif %}
+    </tr>
+    {% empty %}
+    <tr>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+    </tr>
+    {% endfor %}
+</table>
