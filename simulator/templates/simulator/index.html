@@ -47,3 +47,9 @@
         Initialize
     </button>
 </form>
+<form action="{% url 'simulator:flush' %}" method="post">
+    {% csrf_token %}
+    <button type="submit" value="flush">
+        Flush database
+    </button>
+</form>

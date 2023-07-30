@@ -6,6 +6,7 @@ from simulator.models import Drone, DroneType, DroneDynamics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import random
+from datetime import datetime
 
 # REST API views
 class DroneViewSet(viewsets.ModelViewSet):
@@ -42,11 +43,42 @@ def index(request):
 def start(request):
     return HttpResponse("Started")
 
+def flush(request):
+    DroneType.objects.all().delete()
+    return HttpResponse("Successful deleted database entries")
+
 def create_serial_number(dronetype):
     name = dronetype.manufacturer[0:2] + dronetype.typename[0:2]
     year = str(random.randint(2020, 2031))
     serial = ('%06x' % random.randrange(16**6)).upper()
     return '-'.join([name, year, serial])
+
+def create_initial_drone_dynamics(drone, place_id=0):
+    places = (
+            ("Frankfurt Hauptbahnhof", 50.107185, 8.663789),
+            ("Römerberg", 50.110924, 8.682127),
+            ("Palmengarten", 50.120598, 8.657251),
+            ("Eiserner Steg", 50.107699, 8.678109),
+            ("Goethe-Haus", 50.116536, 8.681864),
+            ("Flughafen Frankfurt", 50.050194, 8.570487),
+            ("Opel Zoo", 50.192078, 8.496004),
+            ("Schloss Johannisburg", 50.039364, 8.214841),
+            ("Mainz Dom", 49.998984, 8.276432),
+            ("Darmstadt Mathildenhöhe", 49.870867, 8.655013)
+            )
+
+    return DroneDynamics(
+            drone=drone, 
+            speed=drone.dronetype.max_speed, 
+            align_roll=0.0, 
+            align_pitch=0.0, 
+            align_yaw=0.0, 
+            longitude=places[place_id][1], 
+            latitude=places[place_id][2], 
+            battery_status=drone.dronetype.battery_capacity, 
+            last_seen=datetime.now(),
+            status = "ON",
+            )
 
 def init(request):
     if Drone.objects.count() > 0:
@@ -75,11 +107,14 @@ def init(request):
             Drone(dronetype=dronetypes[8], serialnumber=create_serial_number(dronetypes[8]), carriage_weight=0, carriage_type="NOT"),
             Drone(dronetype=dronetypes[9], serialnumber=create_serial_number(dronetypes[9]), carriage_weight=300, carriage_type="ACT"),
             ]
+    dronedynamics = [create_initial_drone_dynamics(drones[i], i) for i in range(10)]
 
     for i in dronetypes:
         i.save()
     for i in drones:
         i.save()
-    return HttpResponse("Initialized with {} dronetypes and {} drones!".format(len(dronetypes), len(drones)))
+    for i in dronedynamics:
+        i.save()
+    return HttpResponse("Initialized with {} dronetypes and {} drones each with initial drone dynamics!".format(len(dronetypes), len(drones)))
 
 
