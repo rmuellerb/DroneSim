@@ -52,7 +52,7 @@ def flush(request):
 
 def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
-    return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all()})
+    return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
 
 # Helpers
 
@@ -80,23 +80,27 @@ def calculate_new_battery_level(dynamics, flight_duration_hr):
     # is involved.
     total_battery = dynamics.drone.dronetype.battery_capacity
     new_battery_level = dynamics.battery_status - (total_battery * flight_duration_hr)
-    return int(new_battery_level)
+    #print("Battery: {}/{}, reducing by {} due to {} hrs flight time".format(new_battery_level, total_battery, total_battery*flight_duration_hr, flight_duration_hr))
+    return max(0, int(new_battery_level))
 
-def simulate_dynamics(dynamics, yaw=-1, last_seen=timezone.now()):
+def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
+    if dynamics.battery_status <= 0:
+        return DroneDynamics(drone=dynamics.drone, speed=dynamics.speed, align_roll=dynamics.align_roll, align_pitch=dynamics.align_pitch, align_yaw=dynamics.align_yaw, longitude=dynamics.longitude, latitude=dynamics.latitude, battery_status=0, last_seen=dynamics.last_seen, timestamp=timestamp, status="OF")
     if yaw < 0:
         new_yaw = random.randint(0,360)
     else:
         new_yaw=yaw
     new_speed = random.randint(1, dynamics.drone.dronetype.max_speed)
-    new_long, new_lat = calculate_new_coordinates(dynamics.longitude, dynamics.latitude, dynamics.speed, dynamics.align_yaw, dynamics.last_seen, last_seen)
-    new_battery = calculate_new_battery_level(dynamics, (last_seen - dynamics.last_seen).total_seconds() / 3600)
+    new_long, new_lat = calculate_new_coordinates(dynamics.longitude, dynamics.latitude, dynamics.speed, dynamics.align_yaw, dynamics.last_seen, timestamp)
+    new_battery = calculate_new_battery_level(dynamics, (timestamp - dynamics.last_seen).total_seconds() / 3600)
     if new_battery > 0:
         new_status = "ON"
     else:
-        new_status = "OFF"
-    return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=last_seen, timestamp=last_seen, status=new_status)
+        new_status = "OF"
+        new_speed = 0
+    return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=timestamp, timestamp=timestamp, status=new_status)
 
-def create_initial_drone_dynamics(drone, place_id=0, last_seen=timezone.now()):
+def create_initial_drone_dynamics(drone, place_id=0, timestamp=timezone.now()):
     places = (
             ("Frankfurt Hauptbahnhof", 50.107185833, 8.663789667),
             ("Römerberg", 50.110924000, 8.682127000),
@@ -109,7 +113,7 @@ def create_initial_drone_dynamics(drone, place_id=0, last_seen=timezone.now()):
             ("Mainz Dom", 49.998984000, 8.276432000),
             ("Darmstadt Mathildenhöhe", 49.870867000, 8.655013000),
             )
-    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=places[place_id][1], latitude=places[place_id][2], battery_status=drone.dronetype.battery_capacity, last_seen=last_seen, timestamp=last_seen, status = "ON")
+    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=places[place_id][1], latitude=places[place_id][2], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
 
 def init(request):
     if Drone.objects.count() > 0:
@@ -140,11 +144,11 @@ def init(request):
             ]
 
     # Creating dynamics for the past 5 minutes
-    init_delta = timedelta(minutes=5)
+    init_delta = timedelta(minutes=50)
     # Creating dynamics every 5 seconds
-    recurring_delta = timedelta(seconds=5)
+    recurring_delta = timedelta(seconds=10)
     starttime = timezone.now() - init_delta
-    dronedynamics = [create_initial_drone_dynamics(drones[i], i, last_seen=starttime) for i in range(10)]
+    dronedynamics = [create_initial_drone_dynamics(drones[i], i, timestamp=starttime) for i in range(10)]
 
     for i in dronetypes:
         i.save()
@@ -154,12 +158,7 @@ def init(request):
         i.save()
     for i in range(int(init_delta/recurring_delta)):
         simulated_time = starttime + ((i+1)*recurring_delta)
-        dronedynamics = [simulate_dynamics(j, last_seen=simulated_time) for j in dronedynamics]
+        dronedynamics = [simulate_dynamics(j, timestamp=simulated_time) for j in dronedynamics]
         for j in dronedynamics:
             j.save()
-    for i in drones:
-        print("# {}".format(i))
-        for j in i.dynamics.all():
-            print("\t{}".format(j))
-    return HttpResponse("Initialized with {} dronetypes and {} drones each with initial drone dynamics!".format(len(dronetypes), len(drones)))
-
+    return HttpResponse("Initialized with {} dronetypes and {} drones each with {} initial drone dynamics values!".format(len(dronetypes), len(drones), int(init_delta/recurring_delta)))
