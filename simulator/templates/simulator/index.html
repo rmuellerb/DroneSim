@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 <table>
     <tr>
+        <th>ID</th>
         <th>Manufacturer</th>
         <th>Typename</th>
         <th>Serialnumber</th>
@@ -12,6 +13,7 @@
     </tr>
     {% for drone in drones %}
     <tr>
+        <td>{{drone.id}}</td>
         <td>{{drone.dronetype.manufacturer}}</td>
         <td>{{drone.dronetype.typename}}</td>
         <td>{{drone.serialnumber}}</td>
@@ -26,6 +28,7 @@
     </tr>
     {% empty %}
     <tr>
+        <td>not available</td>
         <td>not available</td>
         <td>not available</td>
         <td>not available</td>

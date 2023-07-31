@@ -33,16 +33,16 @@ class Drone(models.Model):
 
 class DroneDynamics(models.Model):
     def __str__(self):
-        return "[{}]: {}, status: {}".format(self.timestamp, self.drone, self.status)
+        return "[{}] Status: {}, coordinates: {}/{}, speed: {}/{}, battery: {}/{}".format(self.timestamp, self.status, self.longitude, self.latitude, self.speed, self.drone.dronetype.max_speed, self.battery_status, self.drone.dronetype.battery_capacity)
     
     drone = models.ForeignKey(Drone, on_delete=models.CASCADE, related_name="dynamics")
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(help_text="Timestamp of this data")
     speed = models.PositiveIntegerField(help_text="Current speed in km/h")
     align_roll = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current alignment on x-axis")
     align_pitch = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current algnment on y-axis")
     align_yaw = models.DecimalField(max_digits=5, decimal_places=2, default=000.00, help_text="Current alignment on z-axis")
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, help_text="Current position longitude with a precision of 6 decimal places")
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, help_text="Current position latitude with a precision of 6 decimal places")
+    longitude = models.DecimalField(max_digits=12, decimal_places=9, help_text="Current position longitude with a precision of 6 decimal places")
+    latitude = models.DecimalField(max_digits=12, decimal_places=9, help_text="Current position latitude with a precision of 6 decimal places")
     battery_status = models.PositiveIntegerField(help_text="Current battery charge in mAh")
     last_seen = models.DateTimeField(help_text="Last contact to drone")
     STATUS_ONLINE = "ON"

@@ -1,0 +1,42 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+<table>
+    <tr>
+        <th>Timestamp</th>
+        <th>Last seen</th>
+        <th>Status</th>
+        <th>Speed</th>
+        <th>Alignment roll</th>
+        <th>Alignment pitch</th>
+        <th>Alignment yaw</th>
+        <th>Position (lon/lat)</th>
+        <th>Battery</th>
+    </tr>
+    {% for dyn in dynamics %}
+    <tr>
+        <td>{{dyn.timestamp}}</td>
+        <td>{{dyn.last_seen}}</td>
+        <td>{{dyn.status}}</td>
+        <td>{{dyn.speed}}/{{dyn.drone.dronetype.max_speed}} km/h</td>
+        <td>{{dyn.align_roll}}</td>
+        <td>{{dyn.align_pitch}}</td>
+        <td>{{dyn.align_yaw}}</td>
+        <td>({{dyn.longitude}})({{dyn.latitude}})</td>
+        <td>{{dyn.battery_status}}/{{dyn.drone.dronetype.battery_capacity}}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+    </tr>
+    {% endfor %}
+</table>
+<br>

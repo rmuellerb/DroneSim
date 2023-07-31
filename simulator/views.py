@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import viewsets, permissions
@@ -41,8 +41,7 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
 
 def index(request):
     drones = Drone.objects.all()
-    context = {'drones': drones}
-    return render(request, 'simulator/index.html', context)
+    return render(request, 'simulator/index.html', {'drones': drones})
 
 def start(request):
     return HttpResponse("Started")
@@ -50,6 +49,12 @@ def start(request):
 def flush(request):
     DroneType.objects.all().delete()
     return HttpResponse("Successful deleted database entries")
+
+def dynamics(request, drone_id):
+    drone = get_object_or_404(Drone, pk=drone_id)
+    return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all()})
+
+# Helpers
 
 def create_serial_number(dronetype):
     name = dronetype.manufacturer[0:2] + dronetype.typename[0:2]
@@ -67,7 +72,7 @@ def calculate_new_coordinates(longitude, latitude, speed, heading, last_sighting
 
     new_longitude = longitude + delta_longitude
     new_latitude = latitude + delta_latitude
-    return round(new_longitude, 6), round(new_latitude, 6)
+    return round(new_longitude, 9), round(new_latitude, 9)
 
 def calculate_new_battery_level(dynamics, flight_duration_hr):
     # TODO: as of today, we assume that each drone has a total battery
@@ -89,22 +94,22 @@ def simulate_dynamics(dynamics, yaw=-1, last_seen=timezone.now()):
         new_status = "ON"
     else:
         new_status = "OFF"
-    return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=last_seen, status=new_status)
+    return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=last_seen, timestamp=last_seen, status=new_status)
 
 def create_initial_drone_dynamics(drone, place_id=0, last_seen=timezone.now()):
     places = (
-            ("Frankfurt Hauptbahnhof", 50.107185, 8.663789),
-            ("Römerberg", 50.110924, 8.682127),
-            ("Palmengarten", 50.120598, 8.657251),
-            ("Eiserner Steg", 50.107699, 8.678109),
-            ("Goethe-Haus", 50.116536, 8.681864),
-            ("Flughafen Frankfurt", 50.050194, 8.570487),
-            ("Opel Zoo", 50.192078, 8.496004),
-            ("Schloss Johannisburg", 50.039364, 8.214841),
-            ("Mainz Dom", 49.998984, 8.276432),
-            ("Darmstadt Mathildenhöhe", 49.870867, 8.655013)
+            ("Frankfurt Hauptbahnhof", 50.107185833, 8.663789667),
+            ("Römerberg", 50.110924000, 8.682127000),
+            ("Palmengarten", 50.120598000, 8.657251000),
+            ("Eiserner Steg", 50.107699000, 8.678109000),
+            ("Goethe-Haus", 50.116536000, 8.681864000),
+            ("Flughafen Frankfurt", 50.050194000, 8.570487000),
+            ("Opel Zoo", 50.192078000, 8.496004000),
+            ("Schloss Johannisburg", 50.039364000, 8.214841000),
+            ("Mainz Dom", 49.998984000, 8.276432000),
+            ("Darmstadt Mathildenhöhe", 49.870867000, 8.655013000),
             )
-    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=places[place_id][1], latitude=places[place_id][2], battery_status=drone.dronetype.battery_capacity, last_seen=last_seen, status = "ON")
+    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=places[place_id][1], latitude=places[place_id][2], battery_status=drone.dronetype.battery_capacity, last_seen=last_seen, timestamp=last_seen, status = "ON")
 
 def init(request):
     if Drone.objects.count() > 0:
@@ -133,7 +138,7 @@ def init(request):
             Drone(dronetype=dronetypes[8], serialnumber=create_serial_number(dronetypes[8]), carriage_weight=0, carriage_type="NOT"),
             Drone(dronetype=dronetypes[9], serialnumber=create_serial_number(dronetypes[9]), carriage_weight=300, carriage_type="ACT"),
             ]
-    
+
     # Creating dynamics for the past 5 minutes
     init_delta = timedelta(minutes=5)
     # Creating dynamics every 5 seconds
@@ -152,6 +157,9 @@ def init(request):
         dronedynamics = [simulate_dynamics(j, last_seen=simulated_time) for j in dronedynamics]
         for j in dronedynamics:
             j.save()
-
+    for i in drones:
+        print("# {}".format(i))
+        for j in i.dynamics.all():
+            print("\t{}".format(j))
     return HttpResponse("Initialized with {} dronetypes and {} drones each with initial drone dynamics!".format(len(dronetypes), len(drones)))
 

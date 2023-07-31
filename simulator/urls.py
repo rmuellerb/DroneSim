@@ -8,4 +8,5 @@ urlpatterns = [
     path('start/', views.start, name='start'),
     path('init/', views.init, name='init'),
     path('flush/', views.flush, name='flush'),
+    path('<int:drone_id>/dynamics', views.dynamics, name='dynamics'),
 ]
