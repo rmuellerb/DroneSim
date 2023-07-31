@@ -34,16 +34,11 @@
         <td>not available</td>
         <td>not available</td>
         <td>not available</td>
+        <td>not available</td>
     </tr>
     {% endfor %}
 </table>
 <br>
-<form action="{% url 'simulator:start' %}" method="post">
-    {% csrf_token %}
-    <button type="submit" value="start">
-        Start Simulator
-    </button>
-</form>
 <form action="{% url 'simulator:init' %}" method="post">
     {% csrf_token %}
     <button type="submit" value="init">
