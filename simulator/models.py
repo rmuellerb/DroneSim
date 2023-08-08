@@ -35,6 +35,7 @@ class DroneDynamics(models.Model):
     def __str__(self):
         return "[{}] Status: {}, coordinates: {}/{}, speed: {}/{}, battery: {}/{}".format(self.timestamp, self.status, self.longitude, self.latitude, self.speed, self.drone.dronetype.max_speed, self.battery_status, self.drone.dronetype.battery_capacity)
     
+    # ToDo: Barometric height (relative to start), GPS height 
     drone = models.ForeignKey(Drone, on_delete=models.CASCADE, related_name="dynamics")
     timestamp = models.DateTimeField(help_text="Timestamp of this data")
     speed = models.PositiveIntegerField(help_text="Current speed in km/h")

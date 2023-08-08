@@ -1,4 +1,9 @@
 table, th, td { 
     border-collapse: collapse;
     border: solid 1px black;
+    padding: 10px;
+}
+th, td {
+    padding-left: 10px;
+    padding-right: 10px;
 }

@@ -50,6 +50,15 @@ def flush(request):
     DroneType.objects.all().delete()
     return HttpResponse("Successful deleted database entries")
 
+def drones(request):
+    return render(request, 'simulator/drones.html', {'drones': Drone.objects.all()})
+
+def dronetypes(request):
+    return render(request, 'simulator/dronetypes.html', {'dronetypes': DroneType.objects.all()})
+
+def dronedynamics(request):
+    return render(request, 'simulator/dronedynamics.html', {'dronedynamics': DroneDynamics.objects.all()})
+
 def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
     return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
