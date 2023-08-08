@@ -1,0 +1,50 @@
+{% load static %}
+<h1> Overview DroneDynamics </h1>
+<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Timestamp</th>
+        <th>Drone</th>
+        <th>Speed</th>
+        <th>Alignment Roll</th>
+        <th>Control Range</th>
+        <th>Alignment Yaw</th>
+        <th>Longitude</th>
+        <th>Latitude</th>
+        <th>Battery Status</th>
+        <th>Last Seen</th>
+        <th>Status</th>
+    </tr>
+    {% for dyn in dronedynamics %}
+    <tr>
+        <td>{{dyn.id}}</td>
+        <td>{{dyn.timestamp}}</td>
+        <td>{{dyn.drone}}</td>
+        <td>{{dyn.speed}}</td>
+        <td>{{dyn.align_roll}}</td>
+        <td>{{dyn.align_pitch}}</td>
+        <td>{{dyn.align_yaw}}</td>
+        <td>{{dyn.longitude}}</td>
+        <td>{{dyn.latitude}}</td>
+        <td>{{dyn.battery_status}}</td>
+        <td>{{dyn.last_seen}}</td>
+        <td>{{dyn.status}}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+    </tr>
+    {% endfor %}
+</table>

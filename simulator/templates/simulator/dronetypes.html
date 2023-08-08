@@ -1,0 +1,38 @@
+{% load static %}
+<h1> Overview Dronetypes </h1>
+<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Manufacturer</th>
+        <th>Typename</th>
+        <th>Weight</th>
+        <th>Maximum Speed</th>
+        <th>Battery Capacity</th>
+        <th>Control Range</th>
+        <th>Maximum Carriage</th>
+    </tr>
+    {% for dronetype in dronetypes %}
+    <tr>
+        <td>{{dronetype.id}}</td>
+        <td>{{dronetype.manufacturer}}</td>
+        <td>{{dronetype.typename}}</td>
+        <td>{{dronetype.weight}}</td>
+        <td>{{dronetype.max_speed}}</td>
+        <td>{{dronetype.battery_capacity}}</td>
+        <td>{{dronetype.control_range}}</td>
+        <td>{{dronetype.max_carriage}}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+    </tr>
+    {% endfor %}
+</table>

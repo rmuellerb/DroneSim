@@ -1,0 +1,32 @@
+{% load static %}
+<h1> Overview Drones </h1>
+<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Dronetype</th>
+        <th>Created</th>
+        <th>Serialnumber</th>
+        <th>Carriage Weight</th>
+        <th>Carriage Type</th>
+    </tr>
+    {% for drone in drones %}
+    <tr>
+        <td>{{drone.id}}</td>
+        <td>{{drone.dronetype}}</td>
+        <td>{{drone.created}}</td>
+        <td>{{drone.serialnumber}}</td>
+        <td>{{drone.carriage_weight}}</td>
+        <td>{{drone.carriage_type}}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+        <td>not available</td>
+    </tr>
+    {% endfor %}
+</table>
