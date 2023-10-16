@@ -4,10 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
+django = "==4.2.3"
+djangorestframework = "==3.14.0"
 markdown = "*"
 django-filter = "*"
+django-rest-knox = "==4.2.0"
 
 [dev-packages]
 
