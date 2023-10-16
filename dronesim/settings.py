@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'knox',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
 
 #DATABASES = {
 #    'default': {
@@ -138,10 +141,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Settings for the REST API
 
 REST_FRAMEWORK= {
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': (
+        'rest_framework.pagination.PageNumberPagination',
+    ),
     'PAGE_SIZE': 10,
 }
 
