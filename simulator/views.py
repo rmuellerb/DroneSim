@@ -12,6 +12,15 @@ from math import sin, cos, radians
 import threading
 import time
 
+# Permissions
+class ReadOnlyPermissionStudents(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_staff:
+            return True
+        return False
+
 # REST API views
 class DroneViewSet(viewsets.ModelViewSet):
     """
@@ -19,7 +28,7 @@ class DroneViewSet(viewsets.ModelViewSet):
     """
     queryset = Drone.objects.all().order_by('created')
     serializer_class = DroneSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ReadOnlyPermissionStudents]
 
 class DroneTypeViewSet(viewsets.ModelViewSet):
     """
@@ -27,7 +36,7 @@ class DroneTypeViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneType.objects.all().order_by('manufacturer')
     serializer_class = DroneTypeSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ReadOnlyPermissionStudents]
 
 class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
@@ -35,13 +44,19 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneDynamics.objects.all().order_by('timestamp')
     serializer_class = DroneDynamicsSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ReadOnlyPermissionStudents]
 
 # Create your views here.
-
 def index(request):
+
+    #TODO: add login/logout possibilities on website
     drones = Drone.objects.all()
-    return render(request, 'simulator/index.html', {'drones': drones})
+    context= {
+        'drones': drones,
+        'render_button': request.user.is_staff,
+    }
+
+    return render(request, 'simulator/index.html', context)
 
 def start(request):
     return HttpResponse("Started")
