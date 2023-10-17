@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from django.utils import timezone
-from django.contrib.auth import logout, authenticate, login
+from django.utils import timezone 
 from rest_framework import viewsets, permissions
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics
@@ -61,8 +60,11 @@ def start(request):
     return HttpResponse("Started")
 
 def flush(request):
-    DroneType.objects.all().delete()
-    return HttpResponse("Successful deleted database entries")
+    if request.user.is_superuser:
+        DroneType.objects.all().delete()
+        return HttpResponse("Successful deleted database entries")
+    else:
+        return HttpResponse("Not allowed")
 
 def drones(request):
     return render(request, 'simulator/drones.html', {'drones': Drone.objects.all()})
