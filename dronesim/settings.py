@@ -57,7 +57,7 @@ ROOT_URLCONF = 'dronesim.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "simulator/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,6 +137,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Auth
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
 # Settings for the REST API
 
 REST_FRAMEWORK= {
@@ -148,7 +152,12 @@ REST_FRAMEWORK= {
         'rest_framework.authentication.SessionAuthentication',
 
     ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '500/hour'
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
 }
-

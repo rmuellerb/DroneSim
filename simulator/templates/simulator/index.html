@@ -1,5 +1,7 @@
-{% load static %}
+{% extends "simulator/base.html" %}
 
+{% load static %}
+{% block content %}
 <link rel="shortcut icon" type="image/png" href="{% static 'simulator/favicon.ico' %}"/>
 <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 
@@ -56,3 +58,4 @@
     </button>
 </form>
 {% endif %}
+{% endblock %}

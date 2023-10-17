@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.utils import timezone
+from django.contrib.auth import logout, authenticate, login
 from rest_framework import viewsets, permissions
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics
@@ -48,8 +49,6 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
 
 # Create your views here.
 def index(request):
-
-    #TODO: add login/logout possibilities on website
     drones = Drone.objects.all()
     context= {
         'drones': drones,
