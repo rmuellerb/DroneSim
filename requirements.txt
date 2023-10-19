@@ -1,3 +1,17 @@
-Django==4.2.3
-djangorestframework==3.14.0
-django-rest-knox==4.2.0
+-i https://pypi.org/simple
+asgiref==3.7.2; python_version >= '3.7'
+cffi==1.16.0; python_version >= '3.8'
+cryptography==41.0.4; python_version >= '3.7'
+django==4.2.3; python_version >= '3.8'
+django-filter==23.3; python_version >= '3.7'
+django-rest-knox==4.2.0; python_version >= '3.6'
+djangorestframework==3.14.0; python_version >= '3.6'
+drf-yasg==1.21.7; python_version >= '3.6'
+inflection==0.5.1; python_version >= '3.5'
+markdown==3.5; python_version >= '3.8'
+packaging==23.2; python_version >= '3.7'
+pycparser==2.21
+pytz==2023.3.post1
+pyyaml==6.0.1; python_version >= '3.6'
+sqlparse==0.4.4; python_version >= '3.5'
+uritemplate==4.1.1; python_version >= '3.6'
