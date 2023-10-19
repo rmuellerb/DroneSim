@@ -9,6 +9,7 @@ djangorestframework = "==3.14.0"
 markdown = "*"
 django-filter = "*"
 django-rest-knox = "==4.2.0"
+drf-yasg = "*"
 
 [dev-packages]
 
