@@ -13,6 +13,7 @@ import threading
 import time
 
 # Permissions
+# Read-Only for non-writing operations, writing operations for staff
 class ReadOnlyPermissionStudents(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
