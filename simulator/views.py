@@ -169,9 +169,9 @@ def init(request):
             Drone(dronetype=dronetypes[9], serialnumber=create_serial_number(dronetypes[9]), carriage_weight=300, carriage_type="ACT"),
             ]
 
-    # Creating dynamics for the past 5 minutes
-    init_delta = timedelta(minutes=50)
-    # Creating dynamics every 5 seconds
+    # Creating dynamics for the past x minutes
+    init_delta = timedelta(minutes=100)
+    # Creating dynamics every x seconds
     recurring_delta = timedelta(seconds=10)
     starttime = timezone.now() - init_delta
     dronedynamics = [create_initial_drone_dynamics(drones[i], i, timestamp=starttime) for i in range(10)]
