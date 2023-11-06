@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@ll4+2stt--sgpc5qk1io5kdt=6)0r*9g+s5+ao+^!t0!q5()g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["10.18.2.60", "dronesim.facets-labs.com"]
+ALLOWED_HOSTS = ["10.18.2.60", "dronesim.facets-labs.com", "127.0.0.1"]
 
 
 # Application definition
@@ -146,7 +146,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 REST_FRAMEWORK= {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
