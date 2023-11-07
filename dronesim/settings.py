@@ -21,13 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# TODO: Switch to environment variable-based secret
-SECRET_KEY = 'QKEAxp8Cn1wOT01uMKTknM0foGYwlGpFF4m8bDvDVQg3I9Ct5G7GhqwgJkq/IdXoHV5hstU4b/z0ZcCpOJTsvZ3YLvKCIdgISlZta0cXxoQ='
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ["10.18.2.60", "dronesim.facets-labs.com", "127.0.0.1"]
+#SECRET_KEY = 'QKEAxp8Cn1wOT01uMKTknM0foGYwlGpFF4m8bDvDVQg3I9Ct5G7GhqwgJkq/IdXoHV5hstU4b/z0ZcCpOJTsvZ3YLvKCIdgISlZta0cXxoQ='
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = bool(os.environ.get('DEBUG', default=0))
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
+#ALLOWED_HOSTS = ["10.18.2.60", "dronesim.facets-labs.com", "127.0.0.1"]
 
 
 # Application definition
@@ -84,14 +82,25 @@ WSGI_APPLICATION = 'dronesim.wsgi.application'
 #    }
 #}
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.environ.get('POSTGRES_NAME'),
+#        'USER': os.environ.get('POSTGRES_USER'),
+#        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+#        'HOST': 'db',
+#        'PORT': 5432,
+#    }
+#}
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -121,7 +130,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
