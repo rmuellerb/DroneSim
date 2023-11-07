@@ -1,7 +1,17 @@
 # syntax=docker/dockerfile:1
-version: '3'
+version: '3.8'
 
 services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
   web:
     build: .
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver --insecure 0.0.0.0:8000"
@@ -9,3 +19,11 @@ services:
       - .:/app
     ports:
       - "80:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+volumes:
+  postgres_data:
