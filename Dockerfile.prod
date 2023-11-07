@@ -4,8 +4,11 @@ FROM python:3.11.4-slim-buster
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set work directory
-WORKDIR /app
+# Create and set work directory
+ENV HOME=/app
+RUN mkdir $HOME
+RUN mkdir $HOME/staticfiles
+WORKDIR $HOME
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y netcat
@@ -22,8 +25,5 @@ RUN chmod +x /app/entrypoint.prod.sh
 
 # Copy project
 COPY . /app/
-
-# Collect static files
-#RUN python manage.py collectstatic --noinput
 
 ENTRYPOINT ["/app/entrypoint.prod.sh"]
