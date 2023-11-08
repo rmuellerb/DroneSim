@@ -139,8 +139,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Security
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:1337", "http://10.18.2.60:1337", "http://dronesim.facets-labs.com:1337"]
 
 # Auth
 LOGIN_REDIRECT_URL = "/"
