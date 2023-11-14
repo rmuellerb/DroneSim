@@ -39,19 +39,15 @@ IMPORTANT: The following installation instruction is outdated, as the project no
    pipenv shell
    ```
 
-4. **Install dependencies**
+4. **Run the production server using docker-compose**
    ```bash
-   pip install -r requirements.txt
+   docker-compose -f docker-compose.prod.yaml up --build -d
    ```
 
-5. **Run the server using docker-compose**
+5. **Create admin user after db was initially created within the container**
    ```bash
-   docker-compose up --build
-   ```
-
-6. **Create admin user after db was initially created**
-   ```bash
-   python3 manage.py createsuperuser
+   docker ps // find the container ID
+   docker exec -it <container id> python manage.py createsuperuser
    ```
 
 ## Usage
@@ -60,7 +56,7 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 - Access the drone simulation API at:
   ```
-  http://localhost/api/
+  http://<configured IP>/api/
   ```
 
 - [API Documentation](http://localhost/redoc) provides a comprehensive guide on the available endpoints. Alternatively you can use swaggerUI which is available at .../swagger/
@@ -69,7 +65,7 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 - Access the administrative website at:
   ```
-  http://localhost/admin/
+  http://<configured IP>/admin/
   ```
 
 - Use the credentials created before to login
@@ -81,6 +77,8 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 - **Django Admin Integration**: Monitor and manage drone simulations through the administrative website.
 
 - **API**: Retrieve and manage drone data using the Django Rest Framework-backed API.
+
+- **SSL/TLS**: if you want to use SSL/TLS, create your certifciate and configure them in the nginx/ directory. Remember to put the certificates in the directory and tell Dockerfile to copy them.
 
 ## Contribution
 
