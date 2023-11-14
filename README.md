@@ -26,25 +26,31 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-github-username/DroneSim.git
+   git clone https://github.com/rmuellerb/DroneSim.git
    ```
 
 2. **Navigate to the project directory**
    ```bash
    cd DroneSim
    ```
-
-3. **Switch to Pipenv**
+3. **Configure according to your requirements**
    ```bash
-   pipenv shell
+   vim .env.prod
+   // or for the development environment
+   vim .env.dev
    ```
 
-4. **Run the production server using docker-compose**
+4. **Run the production server using docker-compose (using nginx, WSGI and postgres)**
    ```bash
    docker-compose -f docker-compose.prod.yaml up --build -d
    ```
 
-5. **Create admin user after db was initially created within the container**
+5. **(optional) Run the development server using docker-compose (using the internal django web server and postgres)**
+   ```bash
+   docker-compose -f docker-compose.dev.yaml up --build -d
+   ```
+
+6. **Create admin user after db was initially created within the container**
    ```bash
    docker ps // find the container ID
    docker exec -it <container id> python manage.py createsuperuser
