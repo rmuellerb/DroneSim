@@ -112,7 +112,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Security
 #CSRF_COOKIE_SECURE = True
 #SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ["https://localhost", "https://10.18.2.60", "https://dronesim.facets-labs.com"]
 CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_ORIGINS').split(" ")
 
 # Auth
