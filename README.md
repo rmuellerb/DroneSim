@@ -35,9 +35,9 @@ IMPORTANT: The following installation instruction is outdated, as the project no
    ```
 3. **Configure according to your requirements**
    ```bash
-   vim .env.prod
-   // or for the development environment
-   vim .env.dev
+   vim env.prod
+   # or for the development environment:
+   vim env.dev
    ```
 
 4. **Run the production server using docker-compose (using nginx, WSGI and postgres)**
@@ -52,9 +52,11 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 6. **Create admin user after db was initially created within the container**
    ```bash
-   docker ps // find the container ID
+   docker ps # find the container ID
    docker exec -it <container id> python manage.py createsuperuser
    ```
+7. **Create new certificates**
+    It is important that you create new certificates for your production server, as the ones provided are just for testing purposes.
 
 ## Usage
 
@@ -65,7 +67,7 @@ IMPORTANT: The following installation instruction is outdated, as the project no
   http://<configured IP>/api/
   ```
 
-- [API Documentation](http://localhost/redoc) provides a comprehensive guide on the available endpoints. Alternatively you can use swaggerUI which is available at .../swagger/
+- [API Documentation](http://<configured IP>/redoc) provides a comprehensive guide on the available endpoints. Alternatively you can use swaggerUI which is available at .../swagger/
 
 ### Admin Website
 
@@ -84,7 +86,7 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 - **API**: Retrieve and manage drone data using the Django Rest Framework-backed API.
 
-- **SSL/TLS**: if you want to use SSL/TLS, create your certifciate and configure them in the nginx/ directory. Remember to put the certificates in the directory and tell Dockerfile to copy them.
+- **SSL/TLS**: if you want to use SSL/TLS, create your certifciate and configure them in the nginx/ directory. Remember to put the certificates in the directory and tell Dockerfile to copy them. Self-signed certificates may introduce issues when interacting with the API if not configured properly, so consider using a service such as letsencrypt.
 
 ## Contribution
 
