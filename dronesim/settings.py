@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #SECRET_KEY = 'QKEAxp8Cn1wOT01uMKTknM0foGYwlGpFF4m8bDvDVQg3I9Ct5G7GhqwgJkq/IdXoHV5hstU4b/z0ZcCpOJTsvZ3YLvKCIdgISlZta0cXxoQ='
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = bool(os.environ.get('DEBUG', default=0))
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(" ")
 
 # Application definition
 INSTALLED_APPS = [
@@ -78,6 +78,10 @@ DATABASES = {
     }
 }
 
+# Celery and Redis configuration
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -112,7 +116,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Security
 #CSRF_COOKIE_SECURE = True
 #SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_ORIGINS').split(" ")
+CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_ORIGINS', '127.0.0.1').split(" ")
 
 # Auth
 LOGIN_REDIRECT_URL = "/"

@@ -2,6 +2,28 @@
 version: '3.8'
 
 services:
+  celery:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: celery -A dronesim worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - ./env.dev
+    depends_on:
+      - web
+      - db
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
   db:
     image: postgres
     volumes:
@@ -24,6 +46,8 @@ services:
       - ./env.dev
     depends_on:
       - db
+      - redis
 
 volumes:
   postgres_data:
+    redis_data:
