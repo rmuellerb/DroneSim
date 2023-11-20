@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Drone Simulator</title>
-</head>
-<body>
-    <header>
-        <nav>
+    <head>
+        <title>Drone Simulator</title>
+    </head>
+    <body>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+        <div class="header-menu">
             {% if user.is_authenticated %}
-                {{ user.username }}!
-                <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'logout' %}">Hello {{ user.username }} - Logout</a>
             {% else %}
-                <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'login' %}">Login</a>
             {% endif %}
-        </nav>
-    </header>
-
-    <div>
-        {% block content %}
-        {% endblock %}
-    </div>
-</body>
+            <a href="{% url 'index' %}">Overview</a>
+            <a href="{% url 'simulator:drones' %}">Drones</a>
+            <a href="{% url 'simulator:dronetypes' %}">DroneTypes</a>
+            <a href="{% url 'simulator:dronedynamics' %}">DroneDynamics</a>
+        </div>
+        <div>
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div class="footer-menu">
+            <a href="#imprint"></a>
+        </div>
+    </body>
 </html>
 

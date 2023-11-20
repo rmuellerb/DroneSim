@@ -1,6 +1,9 @@
+{% extends "simulator/base.html" %}
 {% load static %}
-<h1> Overview DroneDynamics </h1>
+{% block content %}
 <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+
+<h1> Overview DroneDynamics </h1>
 <table>
     <tr>
         <th>ID</th>
@@ -48,3 +51,4 @@
     </tr>
     {% endfor %}
 </table>
+{% endblock %}

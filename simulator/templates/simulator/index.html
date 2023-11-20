@@ -5,6 +5,7 @@
 <link rel="shortcut icon" type="image/png" href="{% static 'simulator/favicon.ico' %}"/>
 <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
 
+<h1>Overview</h1>
 <table>
     <tr>
         <th>ID</th>
@@ -43,19 +44,27 @@
     {% endfor %}
 </table>
 <br>
+<div>
+    {% if user.is_superuser %}
+    <form action="{% url 'simulator:init' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" value="init">
+            Initialize
+        </button>
+    </form>
+    <form action="{% url 'simulator:flush' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" value="flush">
+            Flush database
+        </button>
+    </form>
 
-{% if render_button %}
-<form action="{% url 'simulator:init' %}" method="post">
-    {% csrf_token %}
-    <button type="submit" value="init">
-        Initialize
-    </button>
-</form>
-<form action="{% url 'simulator:flush' %}" method="post">
-    {% csrf_token %}
-    <button type="submit" value="flush">
-        Flush database
-    </button>
-</form>
-{% endif %}
+    <form action="{% url 'simulator:index' %}" method="post">
+        {% csrf_token %}
+        {{ modechooseform.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    {% endif %}
+</div>
+
 {% endblock %}

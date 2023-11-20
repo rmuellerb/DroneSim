@@ -1,6 +1,10 @@
 from django.db import models
 
 # Create your models here.
+
+class SimulatorSettings(models.Model):
+    mode = models.CharField(max_length=10, choices=[('static', 'Static'), ('live', 'Live')])
+
 class DroneType(models.Model):
     def __str__(self):
         return self.manufacturer + ": " + self.typename
@@ -29,7 +33,7 @@ class Drone(models.Model):
             (CARRIAGE_ACTUATORS, "Actuators"),
             (CARRIAGE_NOTHING, "Nothing"),
             ]
-    carriage_type = models.CharField(max_length=3, choices=CARRIAGE_CHOICES, default=CARRIAGE_NOTHING)
+    carriage_type = models.CharField(max_length=3, choices=CARRIAGE_CHOICES, default=CARRIAGE_NOTHING, help_text="Type of carriage. SEN for sensor, ACT for actuator, and NOT for nothing.")
 
 class DroneDynamics(models.Model):
     def __str__(self):
@@ -54,4 +58,4 @@ class DroneDynamics(models.Model):
             (STATUS_OFFLINE, "Offline"),
             (STATUS_ISSUES, "Issues"),
             ]
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS_OFFLINE)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS_OFFLINE, help_text="Status of the drone. ON for online, OF for offline, IS for issues.")
