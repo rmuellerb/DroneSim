@@ -22,7 +22,7 @@ services:
       - "6379:6379"
     command: redis-server --appendonly yes
     volumes:
-      - redis-data:/data
+      - redis_data:/data
 
   nginx:
     build: ./nginx
