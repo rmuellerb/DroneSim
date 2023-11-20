@@ -12,6 +12,7 @@ from math import sin, cos, radians
 import threading
 import time
 from .forms import ModeChooseForm
+from .tasks import add
 
 # Permissions
 # Read-Only for non-writing operations, writing operations for staff
@@ -50,6 +51,8 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
 
 # Create your views here.
 def index(request):
+    print("###### Task gestartet...")
+    add.delay(10,10)
     modechooseform = ModeChooseForm(request.POST or None)
     if modechooseform.is_valid():
         mode = modechooseform.cleaned_data['simulator_mode']
