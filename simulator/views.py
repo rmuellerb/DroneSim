@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.utils import timezone 
 from rest_framework import viewsets, permissions
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
-from simulator.models import Drone, DroneType, DroneDynamics
+from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import random
@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from math import sin, cos, radians
 import threading
 import time
+from .forms import ModeChooseForm
 
 # Permissions
 # Read-Only for non-writing operations, writing operations for staff
@@ -49,12 +50,20 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
 
 # Create your views here.
 def index(request):
+    modechooseform = ModeChooseForm(request.POST or None)
+    if modechooseform.is_valid():
+        mode = modechooseform.cleaned_data['simulator_mode']
+        settings, created = SimulatorSettings.objects.get_or_create(pk=1)
+        settings.mode = mode
+        settings.save()
+        print("Changed mode to {}".format(mode))
+        return HttpResponse('Changed mode successfully to \'{}\''.format(mode))
     drones = Drone.objects.all()
     context= {
         'drones': drones,
         'render_button': request.user.is_staff,
+        'modechooseform': modechooseform,
     }
-
     return render(request, 'simulator/index.html', context)
 
 def start(request):

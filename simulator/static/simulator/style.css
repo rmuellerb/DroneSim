@@ -7,3 +7,55 @@ th, td {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.header-menu {
+    background-color: #333; /* Dunkler Hintergrund */
+    overflow: hidden; /* Verhindert das Überlaufen von Inhalten */
+}
+
+.header-menu a {
+    float: left; /* Links nebeneinander anordnen */
+    color: white; /* Textfarbe */
+    text-align: center; /* Zentriert den Text innerhalb des Links */
+    padding: 14px 16px; /* Innenabstand */
+    text-decoration: none; /* Entfernt Unterstreichung */
+    font-size: 17px; /* Schriftgröße */
+}
+
+.header-menu a:hover {
+    background-color: #ddd; /* Hintergrundfarbe beim Hover */
+    color: black; /* Textfarbe beim Hover */
+}
+
+/* Optional: Stil für den aktiven Link */
+.header-menu a.active {
+    background-color: #04AA6D; /* Hintergrundfarbe für aktiven Link */
+    color: white; /* Textfarbe für aktiven Link */
+}
+
+.footer-menu {
+    background-color: #333; /* Dunkler Hintergrund, gleich wie Header */
+    overflow: hidden; /* Verhindert das Überlaufen von Inhalten */
+    text-align: center; /* Zentriert die Links */
+    margin-top: 20px;
+}
+
+.footer-menu a {
+    display: inline-block; /* Links nebeneinander anordnen */
+    color: white; /* Textfarbe, gleich wie Header */
+    padding: 10px 15px; /* Etwas kleinerer Innenabstand als im Header */
+    text-decoration: none; /* Entfernt Unterstreichung */
+    font-size: 14px; /* Kleinere Schriftgröße */
+}
+
+.footer-menu a:hover {
+    background-color: #ddd; /* Hintergrundfarbe beim Hover */
+    color: black; /* Textfarbe beim Hover */
+}
+
+/* Optional: Stil für den aktiven Link im Footer */
+.footer-menu a.active {
+    background-color: #04AA6D; /* Hintergrundfarbe für aktiven Link */
+    color: white; /* Textfarbe für aktiven Link */
+}
+

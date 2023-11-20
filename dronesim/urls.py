@@ -45,7 +45,7 @@ router.register(r'dronetypes', views.DroneTypeViewSet)
 
 urlpatterns = [
         path('', views.index, name="index"),
-        path('simulator/', include('simulator.urls')),
+        path('simulator/', include('simulator.urls'), name="simulator"),
         path('admin/', admin.site.urls),
         path('api/', include(router.urls)),
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
