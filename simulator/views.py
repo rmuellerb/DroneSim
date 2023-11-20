@@ -54,10 +54,13 @@ def index(request):
     if modechooseform.is_valid():
         mode = modechooseform.cleaned_data['simulator_mode']
         settings, created = SimulatorSettings.objects.get_or_create(pk=1)
-        settings.mode = mode
-        settings.save()
-        print("Changed mode to {}".format(mode))
-        return HttpResponse('Changed mode successfully to \'{}\''.format(mode))
+        if settings.mode != mode:
+            print("Changed mode from \'{}\' to \'{}\'".format(settings.mode, mode))
+            settings.mode = mode
+            settings.save()
+            return HttpResponse('Changed mode successfully to \'{}\''.format(mode))
+        print("Settings not changed")
+        return HttpResponse('Mode remains unchancged at \'{}\''.format(mode))
     drones = Drone.objects.all()
     context= {
         'drones': drones,
