@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 import time
 import random
 from math import sin, cos, radians
+import logging
+
+log = logging.getLogger(__name__)
 
 def create_initial_drone_dynamics(drone, place_id=0, timestamp=timezone.now()):
     places = (
@@ -49,9 +52,15 @@ def create_serial_number(dronetype):
     serial = ('%06x' % random.randrange(16**6)).upper()
     return '-'.join([name, year, serial])
 
+# TODO: We assume that an empty battery is reloaded after 1hr
 def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
     if dynamics.battery_status <= 0:
-        return DroneDynamics(drone=dynamics.drone, speed=dynamics.speed, align_roll=dynamics.align_roll, align_pitch=dynamics.align_pitch, align_yaw=dynamics.align_yaw, longitude=dynamics.longitude, latitude=dynamics.latitude, battery_status=0, last_seen=dynamics.last_seen, timestamp=timestamp, status="OF")
+        if timestamp - dynamics.last_seen >= timedelta(hours=1):
+            dynamics.battery_status = dynamics.drone.dronetype.battery_capacity
+            dynamics.last_seen = timestamp
+            dynamics.save()
+        else:
+            return DroneDynamics(drone=dynamics.drone, speed=dynamics.speed, align_roll=dynamics.align_roll, align_pitch=dynamics.align_pitch, align_yaw=dynamics.align_yaw, longitude=dynamics.longitude, latitude=dynamics.latitude, battery_status=0, last_seen=dynamics.last_seen, timestamp=timestamp, status="OF")
     if yaw < 0:
         new_yaw = random.randint(0,360)
     else:
@@ -67,12 +76,7 @@ def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
     return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=timestamp, timestamp=timestamp, status=new_status)
 
 @app.task
-def add(x, y):
-    print("######### Task beendet...")
-    return x + y
-
-@app.task
-def init_static_drones(init_delta_min=100, tick_delta_sec=10):
+def init_static_drones(init_delta_min=300, tick_delta_sec=30):
     dronetypes = [
             DroneType(manufacturer="GoPro", typename="Karma", weight=1000, max_speed=56, battery_capacity=5100, control_range=1500, max_carriage=400),
             DroneType(manufacturer="Hubsan", typename="X4 H107D", weight=50, max_speed=32, battery_capacity=380, control_range=200, max_carriage=50),
@@ -103,7 +107,7 @@ def init_static_drones(init_delta_min=100, tick_delta_sec=10):
     # Creating dynamics every x seconds
     recurring_delta = timedelta(seconds=tick_delta_sec)
     starttime = timezone.now() - init_delta
-    dronedynamics = [create_initial_drone_dynamics(drones[i], i, timestamp=starttime) for i in range(10)]
+    dronedynamics = [create_initial_drone_dynamics(drones[i], i, timestamp=starttime) for i in range(len(drones))]
 
     for i in dronetypes:
         i.save()
@@ -116,4 +120,5 @@ def init_static_drones(init_delta_min=100, tick_delta_sec=10):
         dronedynamics = [simulate_dynamics(j, timestamp=simulated_time) for j in dronedynamics]
         for j in dronedynamics:
             j.save()
-    print("Initialization task finished!")
+    log.debug("Finished initialization of database")
+    print("Finished initialization of database")
