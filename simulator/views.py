@@ -6,6 +6,9 @@ from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
 from .forms import ModeChooseForm
 from .tasks import add, init_static_drones
+import logging
+
+log = logging.getLogger(__name__)
 
 # Permissions
 # Read-Only for non-writing operations, writing operations for staff
@@ -42,20 +45,18 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     serializer_class = DroneDynamicsSerializer
     permission_classes = [ReadOnlyPermissionStudents]
 
-# Create your views here.
+# Views
 def index(request):
-    print("###### Task gestartet...")
-    add.delay(10,10)
     modechooseform = ModeChooseForm(request.POST or None)
     if modechooseform.is_valid():
         mode = modechooseform.cleaned_data['simulator_mode']
         settings, created = SimulatorSettings.objects.get_or_create(pk=1)
         if settings.mode != mode:
-            print("Changed mode from \'{}\' to \'{}\'".format(settings.mode, mode))
+            log.debug("Changed mode from \'{}\' to \'{}\'".format(settings.mode, mode))
             settings.mode = mode
             settings.save()
             return HttpResponse('Changed mode successfully to \'{}\''.format(mode))
-        print("Settings not changed")
+        log.debug("Settings not changed")
         return HttpResponse('Mode remains unchancged at \'{}\''.format(mode))
     drones = Drone.objects.all()
     context= {
@@ -71,8 +72,10 @@ def start(request):
 def flush(request):
     if request.user.is_superuser:
         DroneType.objects.all().delete()
+        log.debug("Deleted database entries")
         return HttpResponse("Successful deleted database entries")
     else:
+        log.debug("Flush database not allowed")
         return HttpResponse("Not allowed")
 
 def drones(request):
@@ -88,10 +91,10 @@ def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
     return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
 
-# Helpers
-
 def init(request):
     if Drone.objects.count() > 0:
-        return HttpResponse("Database already initialized. Delete database before calling init")
+        log.error("Error initializing database: already initialized. Flush entries to reinizialize.")
+        return HttpResponse("Error initializing database: already initialized. Flush entries to reinitialize.")
     init_call = init_static_drones.delay()
+    log.debug("Started background task to initialize drones")
     return HttpResponse("Started background task to initialize drones")

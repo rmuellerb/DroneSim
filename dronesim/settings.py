@@ -123,6 +123,39 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_ORIGINS', '127.0.0.1').split(
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "root": {
+        "handlers": ['console'],
+        "level": os.environ.get("DJANGO_LOG_LEVEL", "WARNING"),
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.environ.get('DJANGO_LOG_LEVEL', 'WARNING'),
+            'propagate': True,
+        },
+    },
+}
+
+
 # Settings for the REST API
 REST_FRAMEWORK= {
     'DEFAULT_PERMISSION_CLASSES': [
