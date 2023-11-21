@@ -1,61 +1,145 @@
-table, th, td { 
-    border-collapse: collapse;
-    border: solid 1px black;
-    padding: 10px;
-}
-th, td {
-    padding-left: 10px;
-    padding-right: 10px;
+/* Grundlegende Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #333;
 }
 
+/* Header-Menü */
 .header-menu {
-    background-color: #333; /* Dunkler Hintergrund */
-    overflow: hidden; /* Verhindert das Überlaufen von Inhalten */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #004d99; /* Dunkelblau */
+    color: white;
+}
+
+.header-menu .left-item {
+    margin-right: auto;
 }
 
 .header-menu a {
-    float: left; /* Links nebeneinander anordnen */
-    color: white; /* Textfarbe */
-    text-align: center; /* Zentriert den Text innerhalb des Links */
-    padding: 14px 16px; /* Innenabstand */
-    text-decoration: none; /* Entfernt Unterstreichung */
-    font-size: 17px; /* Schriftgröße */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .header-menu a:hover {
-    background-color: #ddd; /* Hintergrundfarbe beim Hover */
-    color: black; /* Textfarbe beim Hover */
+    background-color: #0066cc; /* Helleres Blau */
 }
 
-/* Optional: Stil für den aktiven Link */
-.header-menu a.active {
-    background-color: #04AA6D; /* Hintergrundfarbe für aktiven Link */
-    color: white; /* Textfarbe für aktiven Link */
-}
-
+/* Footer-Menü */
 .footer-menu {
-    background-color: #333; /* Dunkler Hintergrund, gleich wie Header */
-    overflow: hidden; /* Verhindert das Überlaufen von Inhalten */
-    text-align: center; /* Zentriert die Links */
-    margin-top: 20px;
+    background-color: #333; /* Dunkelgrau */
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
 }
 
 .footer-menu a {
-    display: inline-block; /* Links nebeneinander anordnen */
-    color: white; /* Textfarbe, gleich wie Header */
-    padding: 10px 15px; /* Etwas kleinerer Innenabstand als im Header */
-    text-decoration: none; /* Entfernt Unterstreichung */
-    font-size: 14px; /* Kleinere Schriftgröße */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .footer-menu a:hover {
-    background-color: #ddd; /* Hintergrundfarbe beim Hover */
-    color: black; /* Textfarbe beim Hover */
+    background-color: #555; /* Helleres Grau */
 }
 
-/* Optional: Stil für den aktiven Link im Footer */
-.footer-menu a.active {
-    background-color: #04AA6D; /* Hintergrundfarbe für aktiven Link */
-    color: white; /* Textfarbe für aktiven Link */
+/* Überschriften */
+h1, h2, h3, h4, h5, h6 {
+    color: #004d99; /* Dunkelblau, passend zum Header */
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+button, .button {
+    background-color: #004d99; /* Dunkelblau */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover, .button:hover {
+    background-color: #0066cc; /* Helleres Blau */
+}
+
+/* Formulare */
+input[type="text"], input[type="email"], input[type="password"], select, textarea {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background-color: #004d99; /* Dunkelblau */
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0066cc; /* Helleres Blau */
+}
+
+/* Tabellen */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #004d99; /* Dunkelblau */
+    color: white;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+main {
+    margin-bottom: 50px;
+}
+
+.form-container {
+    max-width: 400px;
+    margin: auto;
+}
+
+.index-form-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px; 
+}
+
+.index-form-container form {
+    margin: 0 10px; 
 }
 

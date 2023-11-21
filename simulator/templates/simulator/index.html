@@ -44,7 +44,7 @@
     {% endfor %}
 </table>
 <br>
-<div>
+<div class="index-form-container">
     {% if user.is_superuser %}
     <form action="{% url 'simulator:init' %}" method="post">
         {% csrf_token %}
@@ -58,7 +58,6 @@
             Flush database
         </button>
     </form>
-
     <form action="{% url 'simulator:index' %}" method="post">
         {% csrf_token %}
         {{ modechooseform.as_p }}
