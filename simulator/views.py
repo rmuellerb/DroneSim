@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm
 from rest_framework import viewsets, permissions
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
@@ -77,6 +78,17 @@ def flush(request):
     else:
         log.debug("Flush database not allowed")
         return HttpResponse("Not allowed")
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
 
 def drones(request):
     return render(request, 'simulator/drones.html', {'drones': Drone.objects.all()})
