@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework import routers, permissions
-from simulator import views
+from simulator import views as simulator_views
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
@@ -39,12 +39,13 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
-router.register(r'drones', views.DroneViewSet)
-router.register(r'dronedynamics', views.DroneDynamicsViewSet)
-router.register(r'dronetypes', views.DroneTypeViewSet)
+router.register(r'drones', simulator_views.DroneViewSet)
+router.register(r'dronedynamics', simulator_views.DroneDynamicsViewSet)
+router.register(r'dronetypes', simulator_views.DroneTypeViewSet)
 
 urlpatterns = [
-        path('', views.index, name="index"),
+        path('', simulator_views.index, name="index"),
+        #path('register/', simulator_views.register, name='register'),
         path('simulator/', include('simulator.urls'), name="simulator"),
         path('admin/', admin.site.urls),
         path('api/', include(router.urls)),
