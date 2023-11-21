@@ -6,7 +6,7 @@ from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDyn
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
 from .forms import ModeChooseForm
-from .tasks import add, init_static_drones
+from .tasks import init_static_drones
 import logging
 
 log = logging.getLogger(__name__)
