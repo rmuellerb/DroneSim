@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, permissions
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
@@ -14,8 +15,20 @@ import logging
 log = logging.getLogger(__name__)
 
 # Permissions
-# Read-Only for non-writing operations, writing operations for staff
+class IsSuperUserOrReadOnly(permissions.BasePermission):
+    """
+    Custom permisson to allow read-only for all except superusers
+    """
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user and request.user.is_superuser
+
 class ReadOnlyPermissionStudents(permissions.BasePermission):
+    """
+    Custom permisson tp allow read-only or read/write to people that are
+    marked as "staff"
+    """
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -30,7 +43,7 @@ class DroneViewSet(viewsets.ModelViewSet):
     """
     queryset = Drone.objects.all().order_by('created')
     serializer_class = DroneSerializer
-#    permission_classes = [ReadOnlyPermissionStudents]
+    permission_classes = [IsSuperUserOrReadOnly]
 
 class DroneTypeViewSet(viewsets.ModelViewSet):
     """
@@ -38,7 +51,7 @@ class DroneTypeViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneType.objects.all().order_by('manufacturer')
     serializer_class = DroneTypeSerializer
-#    permission_classes = [ReadOnlyPermissionStudents]
+    permission_classes = [IsSuperUserOrReadOnly]
 
 class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
@@ -46,7 +59,7 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneDynamics.objects.all().order_by('timestamp')
     serializer_class = DroneDynamicsSerializer
-#    permission_classes = [ReadOnlyPermissionStudents]
+    permission_classes = [IsSuperUserOrReadOnly]
 
 # Helper for context
 def create_context(request):
@@ -79,6 +92,7 @@ def index(request):
     context['modechooseform'] = modechooseform
     return render(request, 'simulator/index.html', context)
 
+@login_required
 def flush(request):
     if request.user.is_superuser:
         DroneType.objects.all().delete()
@@ -98,16 +112,19 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+@login_required
 def drones(request):
     context = create_context(request)
     context['drones'] = Drone.objects.all()
     return render(request, 'simulator/drones.html', context)
 
+@login_required
 def dronetypes(request):
     context = create_context(request)
     context['dronetypes'] = DroneType.objects.all()
     return render(request, 'simulator/dronetypes.html', context)
 
+@login_required
 def dronedynamics(request):
     context = create_context(request)
     dronedynamics_list = DroneDynamics.objects.all()
@@ -117,10 +134,12 @@ def dronedynamics(request):
     context['page_obj'] = page_obj
     return render(request, 'simulator/dronedynamics.html', context)
 
+@login_required
 def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
     return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
 
+@login_required
 def init(request):
     if Drone.objects.count() > 0:
         log.error("Error initializing database: already initialized. Flush entries to reinizialize.")
