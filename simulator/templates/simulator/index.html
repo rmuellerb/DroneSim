@@ -44,26 +44,20 @@
     {% endfor %}
 </table>
 <br>
-<div class="index-form-container">
-    {% if user.is_superuser %}
+
+{% if user.is_superuser %}
+<div>
+    <h2>Menu</h2>
     <form action="{% url 'simulator:init' %}" method="post">
         {% csrf_token %}
-        <button type="submit" value="init">
-            Initialize
-        </button>
+        <button type="submit" value="init">Initialize</button>
     </form>
+
     <form action="{% url 'simulator:flush' %}" method="post">
         {% csrf_token %}
-        <button type="submit" value="flush">
-            Flush database
-        </button>
+        <button type="submit" value="flush">Flush database</button>
     </form>
-    <form action="{% url 'simulator:index' %}" method="post">
-        {% csrf_token %}
-        {{ modechooseform.as_p }}
-        <button type="submit">Save</button>
-    </form>
-    {% endif %}
 </div>
+{% endif %}
 
 {% endblock %}

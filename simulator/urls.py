@@ -6,7 +6,6 @@ from . import views
 app_name = 'simulator'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('start/', views.start, name='start'),
     path('init/', views.init, name='init'),
     path('flush/', views.flush, name='flush'),
     path('drones/', views.drones, name='drones'),

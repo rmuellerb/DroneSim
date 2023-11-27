@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'drf_yasg',
 ]
 
@@ -159,9 +160,11 @@ LOGGING = {
 # Settings for the REST API
 REST_FRAMEWORK= {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+#        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
 
