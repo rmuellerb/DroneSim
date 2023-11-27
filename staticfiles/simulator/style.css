@@ -131,15 +131,3 @@ main {
     max-width: 400px;
     margin: auto;
 }
-
-.index-form-container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 10px; 
-}
-
-.index-form-container form {
-    margin: 0 10px; 
-}
-

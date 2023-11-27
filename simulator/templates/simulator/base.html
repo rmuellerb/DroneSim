@@ -30,6 +30,9 @@
             <a href="/api/">API Webaccess</a>
             <a href="{% url 'schema-redoc' %}">Redoc API Docs</a>
             <a href="{% url 'schema-swagger-ui' %}">Swagger API Docs</a>
+            {% if user.is_authenticated %}
+            Token: {{ token }}
+            {% endif %}
         </div>
     </body>
 </html>

@@ -7,6 +7,7 @@ from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
 from .forms import ModeChooseForm
 from .tasks import init_static_drones
+from rest_framework.authtoken.models import Token
 import logging
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class DroneViewSet(viewsets.ModelViewSet):
     """
     queryset = Drone.objects.all().order_by('created')
     serializer_class = DroneSerializer
-    permission_classes = [ReadOnlyPermissionStudents]
+#    permission_classes = [ReadOnlyPermissionStudents]
 
 class DroneTypeViewSet(viewsets.ModelViewSet):
     """
@@ -36,7 +37,7 @@ class DroneTypeViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneType.objects.all().order_by('manufacturer')
     serializer_class = DroneTypeSerializer
-    permission_classes = [ReadOnlyPermissionStudents]
+#    permission_classes = [ReadOnlyPermissionStudents]
 
 class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
@@ -44,7 +45,19 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneDynamics.objects.all().order_by('timestamp')
     serializer_class = DroneDynamicsSerializer
-    permission_classes = [ReadOnlyPermissionStudents]
+#    permission_classes = [ReadOnlyPermissionStudents]
+
+# Helper for context
+def create_context(request):
+    token = "none"
+    if request.user.is_authenticated:
+        t, created = Token.objects.get_or_create(user=request.user)
+        token = t.key
+    context= {
+            'render_button': request.user.is_staff,
+            'token': token,
+            }
+    return context
 
 # Views
 def index(request):
@@ -60,15 +73,10 @@ def index(request):
         log.debug("Settings not changed")
         return HttpResponse('Mode remains unchancged at \'{}\''.format(mode))
     drones = Drone.objects.all()
-    context= {
-        'drones': drones,
-        'render_button': request.user.is_staff,
-        'modechooseform': modechooseform,
-    }
+    context = create_context(request)
+    context['drones'] = drones
+    context['modechooseform'] = modechooseform
     return render(request, 'simulator/index.html', context)
-
-def start(request):
-    return HttpResponse("Started")
 
 def flush(request):
     if request.user.is_superuser:
@@ -89,15 +97,20 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-
 def drones(request):
-    return render(request, 'simulator/drones.html', {'drones': Drone.objects.all()})
+    context = create_context(request)
+    context['drones'] = Drone.objects.all()
+    return render(request, 'simulator/drones.html', context)
 
 def dronetypes(request):
-    return render(request, 'simulator/dronetypes.html', {'dronetypes': DroneType.objects.all()})
+    context = create_context(request)
+    context['dronetypes'] = DroneType.objects.all()
+    return render(request, 'simulator/dronetypes.html', context)
 
 def dronedynamics(request):
-    return render(request, 'simulator/dronedynamics.html', {'dronedynamics': DroneDynamics.objects.all()})
+    context = create_context(request)
+    context['dronedynamics'] = DroneDynamics.objects.all()
+    return render(request, 'simulator/dronedynamics.html', context)
 
 def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
