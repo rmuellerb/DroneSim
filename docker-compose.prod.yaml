@@ -53,6 +53,7 @@ services:
       - "8000"
     volumes:
       - static_volume:/app/staticfiles
+      - dronesim_logs:/var/log/dronesim
     env_file:
       - ./env.prod
     depends_on:
@@ -63,3 +64,4 @@ volumes:
   postgres_data:
   static_volume:
   redis_data:
+  dronesim_logs:
