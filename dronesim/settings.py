@@ -132,11 +132,6 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": "/var/log/dronesim/logs.log",
-        },
     },
     "formatters": {
         "verbose": {
@@ -154,7 +149,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': os.environ.get('DJANGO_LOG_LEVEL', 'WARNING'),
             'propagate': True,
         },
