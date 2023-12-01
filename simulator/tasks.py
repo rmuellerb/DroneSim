@@ -10,7 +10,10 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def create_initial_drone_dynamics(drone, place_id=0, timestamp=timezone.now()):
+def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
+    """
+    Creates an initial drone dynamics orm object. If the place_id is -1, a random place is chosen
+    """
     places = (
             ("Frankfurt Hauptbahnhof", 50.107185833, 8.663789667),
             ("Römerberg", 50.110924000, 8.682127000),
@@ -23,7 +26,10 @@ def create_initial_drone_dynamics(drone, place_id=0, timestamp=timezone.now()):
             ("Mainz Dom", 49.998984000, 8.276432000),
             ("Darmstadt Mathildenhöhe", 49.870867000, 8.655013000),
             )
-    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=places[place_id][1], latitude=places[place_id][2], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
+    place = random.choice(places)
+    if place_id != -1:
+        place = places[place_id]
+    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=place[1], latitude=place[2], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
 
 def calculate_new_coordinates(longitude, latitude, speed, heading, last_sighting_time, current_time):
     heading_rad = radians(heading)
@@ -52,7 +58,7 @@ def create_serial_number(dronetype):
     serial = ('%06x' % random.randrange(16**6)).upper()
     return '-'.join([name, year, serial])
 
-# TODO: We assume that an empty battery is reloaded after 1hr being offline
+# TODO: We assume that an empty battery is reloaded after being offline for 1hr
 def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
     if dynamics.battery_status <= 0:
         if timestamp - dynamics.last_seen >= timedelta(hours=1):
@@ -75,9 +81,9 @@ def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
         new_speed = 0
     return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=timestamp, timestamp=timestamp, status=new_status)
 
-# Default time window is 24hrs with a delta of 60 secs = 1440 entries per drone
+# Default time window is 24hrs with a delta of 60 secs = 1440 entries per drone. Per default, 10 drones are created
 @app.task
-def init_static_drones(init_delta_min=1440, tick_delta_sec=60):
+def init_static_drones(init_delta_min=1440, tick_delta_sec=60, n=20):
     dronetypes = [
             DroneType(manufacturer="GoPro", typename="Karma", weight=1000, max_speed=56, battery_capacity=5100, control_range=1500, max_carriage=400),
             DroneType(manufacturer="Hubsan", typename="X4 H107D", weight=50, max_speed=32, battery_capacity=380, control_range=200, max_carriage=50),
@@ -89,26 +95,34 @@ def init_static_drones(init_delta_min=1440, tick_delta_sec=60):
             DroneType(manufacturer="Autel Robotics", typename="Evo II", weight=1127, max_speed=72, battery_capacity=7100, control_range=9000, max_carriage=800),
             DroneType(manufacturer="Parrot", typename="Anafi", weight=320, max_speed=55, battery_capacity=2700, control_range=4000, max_carriage=200),
             DroneType(manufacturer="Skydio", typename="Skydio 2", weight=775, max_speed=58, battery_capacity=4280, control_range=3500, max_carriage=400),
+            DroneType(manufacturer="Syma", typename="X5C", weight=102, max_speed=40, battery_capacity=500, control_range=150, max_carriage=70),
+            DroneType(manufacturer="Cheerson", typename="CX-10", weight=25, max_speed=20, battery_capacity=100, control_range=50, max_carriage=30),
+            DroneType(manufacturer="JJRC", typename="H36", weight=22, max_speed=30, battery_capacity=150, control_range=100, max_carriage=20),
+            DroneType(manufacturer="Eachine", typename="E58", weight=96, max_speed=35, battery_capacity=500, control_range=200, max_carriage=50),
+            DroneType(manufacturer="Holy Stone", typename="HS100", weight=700, max_speed=45, battery_capacity=3500, control_range=500, max_carriage=500),
+            DroneType(manufacturer="Ryze", typename="Tello", weight=80, max_speed=28, battery_capacity=1100, control_range=100, max_carriage=40),
+            DroneType(manufacturer="Altair Aerial", typename="AA108", weight=85, max_speed=36, battery_capacity=750, control_range=300, max_carriage=60),
+            DroneType(manufacturer="Snaptain", typename="S5C", weight=120, max_speed=40, battery_capacity=550, control_range=150, max_carriage=80),
+            DroneType(manufacturer="Potensic", typename="D80", weight=450, max_speed=50, battery_capacity=2800, control_range=800, max_carriage=200),
+            DroneType(manufacturer="Contixo", typename="F24 Pro", weight=520, max_speed=60, battery_capacity=2500, control_range=1200, max_carriage=250),
             ]
-    drones = [
-            Drone(dronetype=dronetypes[0], serialnumber=create_serial_number(dronetypes[0]), carriage_weight=200, carriage_type="SEN"),
-            Drone(dronetype=dronetypes[1], serialnumber=create_serial_number(dronetypes[1]), carriage_weight=0, carriage_type="NOT"),
-            Drone(dronetype=dronetypes[2], serialnumber=create_serial_number(dronetypes[2]), carriage_weight=400, carriage_type="SEN"),
-            Drone(dronetype=dronetypes[3], serialnumber=create_serial_number(dronetypes[3]), carriage_weight=100, carriage_type="SEN"),
-            Drone(dronetype=dronetypes[4], serialnumber=create_serial_number(dronetypes[4]), carriage_weight=300, carriage_type="ACT"),
-            Drone(dronetype=dronetypes[5], serialnumber=create_serial_number(dronetypes[5]), carriage_weight=150, carriage_type="SEN"),
-            Drone(dronetype=dronetypes[6], serialnumber=create_serial_number(dronetypes[6]), carriage_weight=0, carriage_type="NOT"),
-            Drone(dronetype=dronetypes[7], serialnumber=create_serial_number(dronetypes[7]), carriage_weight=0, carriage_type="NOT"),
-            Drone(dronetype=dronetypes[8], serialnumber=create_serial_number(dronetypes[8]), carriage_weight=0, carriage_type="NOT"),
-            Drone(dronetype=dronetypes[9], serialnumber=create_serial_number(dronetypes[9]), carriage_weight=300, carriage_type="ACT"),
-            ]
+    drones = []
+    for i in range(n):
+        dronetype = random.choice(dronetypes)
+        serialnumber = create_serial_number(dronetype)
+        carriage_type = random.choice(["SEN", "ACT","NOT"])
+        carriage_weight = 0
+        if carriage_type != "NOT":
+            carriage_weight = random.randint(0, dronetype.max_carriage)
+        drone = Drone(dronetype=dronetype, serialnumber=serialnumber, carriage_weight=carriage_weight, carriage_type=carriage_type)
+        drones.append(drone)
 
     # Creating dynamics for the past x minutes
     init_delta = timedelta(minutes=init_delta_min)
     # Creating dynamics every x seconds
     recurring_delta = timedelta(seconds=tick_delta_sec)
     starttime = timezone.now() - init_delta
-    dronedynamics = [create_initial_drone_dynamics(drones[i], i, timestamp=starttime) for i in range(len(drones))]
+    dronedynamics = [create_initial_drone_dynamics(drones[i], -1, timestamp=starttime) for i in range(len(drones))]
 
     for i in dronetypes:
         i.save()
