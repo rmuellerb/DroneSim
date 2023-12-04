@@ -8,4 +8,4 @@ type1 = DroneType(manufacturer="GoPro", typename="Karma", weight=1000, max_speed
 drone1 = Drone(dronetype=type1, serialnumber=views.create_serial_number(type1), carriage_weight=200, carriage_type="SEN")
 dynamics1 = views.create_initial_drone_dynamics(drone1, place_id=0)
 
-print("Setup drone sucessful! You can use type1, drone1, dynamics1 now.")
+print("Setup drone successful! You can use type1, drone1, dynamics1 now.")
