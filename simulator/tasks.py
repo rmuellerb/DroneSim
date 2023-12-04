@@ -81,7 +81,7 @@ def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
         new_speed = 0
     return DroneDynamics(drone=dynamics.drone, speed=new_speed, align_roll=0, align_pitch=0, align_yaw=new_yaw, longitude=new_long, latitude=new_lat, battery_status=new_battery, last_seen=timestamp, timestamp=timestamp, status=new_status)
 
-# Default time window is 24hrs with a delta of 60 secs = 1440 entries per drone. Per default, 10 drones are created
+# Default time window is 24hrs with a delta of 60 secs = 1440 entries per drone. Per default, 20 drones are created
 @app.task
 def init_static_drones(init_delta_min=1440, tick_delta_sec=60, n=20):
     dronetypes = [
