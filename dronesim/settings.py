@@ -82,7 +82,7 @@ DATABASES = {
 # Celery and Redis configuration
 celery_broker_url = os.environ.get("CELERY_BROKER_URL")
 celery_result_backend = os.environ.get("CELERY_RESULT_BACKEND")
-celery_broker_conection_retry_on_startup = True
+celery_broker_connection_retry_on_startup = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

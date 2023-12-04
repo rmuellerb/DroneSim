@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 # Permissions
 class IsSuperUserOrReadOnly(permissions.BasePermission):
     """
-    Custom permisson to allow read-only for all except superusers
+    Custom permission to allow read-only for all except superusers
     """
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -26,7 +26,7 @@ class IsSuperUserOrReadOnly(permissions.BasePermission):
 
 class ReadOnlyPermissionStudents(permissions.BasePermission):
     """
-    Custom permisson tp allow read-only or read/write to people that are
+    Custom permission tp allow read-only or read/write to people that are
     marked as "staff"
     """
     def has_permission(self, request, view):
