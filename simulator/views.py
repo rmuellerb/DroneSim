@@ -15,6 +15,17 @@ import logging
 log = logging.getLogger(__name__)
 
 # Permissions
+class IsAuthenticatedOrSuperuser(permissions.BasePermission):
+    """
+    Custom permission to allow read-only for authenticated users
+    and write permissions for superusers
+    """
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return request.user and request.user.is_authenticated:
+        else:
+            return request.user and request.user.is_superuser
+
 class IsSuperUserOrReadOnly(permissions.BasePermission):
     """
     Custom permission to allow read-only for all except superusers
@@ -24,18 +35,6 @@ class IsSuperUserOrReadOnly(permissions.BasePermission):
             return True
         return request.user and request.user.is_superuser
 
-class ReadOnlyPermissionStudents(permissions.BasePermission):
-    """
-    Custom permission tp allow read-only or read/write to people that are
-    marked as "staff"
-    """
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        if request.user.is_staff:
-            return True
-        return False
-
 # REST API views
 class DroneViewSet(viewsets.ModelViewSet):
     """
@@ -43,7 +42,7 @@ class DroneViewSet(viewsets.ModelViewSet):
     """
     queryset = Drone.objects.all().order_by('created')
     serializer_class = DroneSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
+    permission_classes = [IsAuthenticatedOrSuperuser]
 
 class DroneTypeViewSet(viewsets.ModelViewSet):
     """
@@ -51,7 +50,7 @@ class DroneTypeViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneType.objects.all().order_by('manufacturer')
     serializer_class = DroneTypeSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
+    permission_classes = [IsAuthenticatedOrSuperuser]
 
 class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
@@ -59,7 +58,7 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
     queryset = DroneDynamics.objects.all().order_by('timestamp')
     serializer_class = DroneDynamicsSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
+    permission_classes = [IsAuthenticatedOrSuperuser]
 
 # Helper for context
 def create_context(request):
