@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
@@ -59,6 +59,22 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     queryset = DroneDynamics.objects.all().order_by('timestamp')
     serializer_class = DroneDynamicsSerializer
     permission_classes = [IsAuthenticatedOrSuperuser]
+
+class DroneDynamicListAPIView(generics.ListAPIView):
+    """
+    API endpoint for drone dynamics information based on a drone id
+    """
+    serializer_class = DroneDynamicsSerializer
+    permission_classes = [IsAuthenticatedOrSuperuser]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the drone dynamics for
+        the drone as determined by the drone id portion of the URL.
+        """
+        drone_id = self.kwargs['drone_id']
+        drone = get_object_or_404(Drone, pk=drone_id)
+        return drone.dynamics.all()
 
 # Helper for context
 def create_context(request):
