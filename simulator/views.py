@@ -74,7 +74,7 @@ class DroneDynamicListAPIView(generics.ListAPIView):
         """
         drone_id = self.kwargs['drone_id']
         drone = get_object_or_404(Drone, pk=drone_id)
-        return drone.dynamics.all()
+        return drone.dynamics.all().order_by('timestamp')
 
 # Helper for context
 def create_context(request):
