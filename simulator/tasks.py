@@ -15,6 +15,7 @@ def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
     Creates an initial drone dynamics orm object. If the place_id is -1, a random place is chosen
     """
     places = (
+            # (name, latitude, longitude)
             ("Frankfurt Hauptbahnhof", 50.107185833, 8.663789667),
             ("Römerberg", 50.110924000, 8.682127000),
             ("Palmengarten", 50.120598000, 8.657251000),
@@ -29,7 +30,7 @@ def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
     place = random.choice(places)
     if place_id != -1:
         place = places[place_id]
-    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=place[1], latitude=place[2], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
+    return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=place[2], latitude=place[1], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
 
 def calculate_new_coordinates(longitude, latitude, speed, heading, last_sighting_time, current_time):
     heading_rad = radians(heading)
