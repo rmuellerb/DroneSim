@@ -84,7 +84,7 @@ def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
 
 # Default time window is 24hrs with a delta of 60 secs = 1440 entries per drone. Per default, 20 drones are created
 @app.task
-def init_static_drones(init_delta_min=1440, tick_delta_sec=60, n=20):
+def init_static_drones(init_delta_min=1440, tick_delta_sec=60, n=25):
     dronetypes = [
             DroneType(manufacturer="GoPro", typename="Karma", weight=1000, max_speed=56, battery_capacity=5100, control_range=1500, max_carriage=400),
             DroneType(manufacturer="Hubsan", typename="X4 H107D", weight=50, max_speed=32, battery_capacity=380, control_range=200, max_carriage=50),
