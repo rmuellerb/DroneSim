@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import time
 import random
 from math import sin, cos, radians
+import math
 import logging
 
 log = logging.getLogger(__name__)
@@ -34,15 +35,30 @@ def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
 
 def calculate_new_coordinates(longitude, latitude, speed, heading, last_sighting_time, current_time):
     heading_rad = radians(heading)
+    lat_rad = radians(latitude)
+    long_rad = radians(longitude)
     elapsed_time = (current_time - last_sighting_time).total_seconds() / 3600
-    distance = speed * elapsed_time
+    dist = speed * elapsed_time
+    earth_radius = 6371.0
 
+    """
+    FIXME
+    """
+    new_lat = math.asin(math.sin(lat_rad) * math.cos(dist / earth_radius) + math.cos(lat_rad) * math.sin(dist / earth_radius) * math.cos(heading))
+    new_long = long_rad + math.atan2(math.sin(heading) * math.sin(dist / earth_radius) * math.cos(lat_rad), math.cos(dist / earth_radius) - math.sin(lat_rad) * math.sin(new_lat))
+    
+    """
     delta_longitude = (cos(heading_rad) * distance) / (111.32 * 1000)
     delta_latitude = (sin(heading_rad) * distance) / (111.32 * 1000)
 
     new_longitude = longitude + delta_longitude
     new_latitude = latitude + delta_latitude
     return round(new_longitude, 9), round(new_latitude, 9)
+    """
+    new_lat = math.degrees(new_lat)
+    new_long = math.degrees(new_long)
+    print("New long/lat: {} / {} ".format(new_long, new_lat))
+    return new_long, new_lat
 
 def calculate_new_battery_level(dynamics, flight_duration_hr):
     # TODO: as of today, we assume that each drone has a total battery
