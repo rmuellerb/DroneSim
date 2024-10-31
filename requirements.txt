@@ -1,9 +1,9 @@
-psycopg2-binary==2.9.9
-Django==4.2.7
-django-filter==23.3
-djangorestframework==3.14.0
-gunicorn==21.2.0
-Markdown==3.5.1
-drf-yasg==1.21.7
-celery==5.3.5
+psycopg2-binary==2.9.10
+Django==5.1.2
+django-filter==24.3
+djangorestframework==3.15.2
+gunicorn==23.0.0
+Markdown==3.7
+drf-yasg==1.21.8
+celery==5.4.0
 redis
