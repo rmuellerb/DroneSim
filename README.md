@@ -42,12 +42,12 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 4. **Run the production server using docker-compose (using nginx, WSGI and postgres)**
    ```bash
-   docker-compose -f docker-compose.prod.yaml up --build -d
+   docker compose -f docker-compose.prod.yaml up --build -d
    ```
 
 5. **(optional) Run the development server using docker-compose (using the internal django web server and postgres)**
    ```bash
-   docker-compose -f docker-compose.dev.yaml up --build -d
+   docker compose -f docker-compose.dev.yaml up --build -d
    ```
 
 6. **Create admin user after db was initially created within the container**
