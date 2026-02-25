@@ -1,0 +1,7 @@
+{% extends "simulator/base.html" %}
+{% block content %}
+<p>Logout…</p>
+<script>
+  window.location.replace("{% url 'account_logout' %}");
+</script>
+{% endblock %}

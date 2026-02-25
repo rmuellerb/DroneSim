@@ -162,3 +162,6 @@ def init(request):
     init_call = init_static_drones.delay()
     log.debug("Started background task to initialize drones")
     return HttpResponse("Started background task to initialize drones")
+
+def login_redirect(request):
+    return redirect("/accounts/oidc/authentik/login/")

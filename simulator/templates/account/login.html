@@ -1,0 +1,10 @@
+{% extends "simulator/base.html" %}
+{% block content %}
+<p>Weiterleitung zu Authentik…</p>
+<script>
+  window.location.replace("/accounts/oidc/authentik/login/");
+</script>
+<noscript>
+  <a href="/accounts/oidc/authentik/login/">Login mit Authentik</a>
+</noscript>
+{% endblock %}

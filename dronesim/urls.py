@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework import routers, permissions
 from simulator import views as simulator_views
+from simulator.views import login_redirect
 from rest_framework.urlpatterns import format_suffix_patterns
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
@@ -52,6 +53,7 @@ urlpatterns = [
         path('api/<int:drone_id>/dynamics/', simulator_views.DroneDynamicListAPIView.as_view()),
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
         #path('accounts/', include('django.contrib.auth.urls')),
+        path("accounts/login/", login_redirect, name="account_login"),
         path("accounts/", include("allauth.urls")),
         path("api/auth/", include("dj_rest_auth.urls")),
         re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
