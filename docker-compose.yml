@@ -30,6 +30,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: .env
     environment:
       DATABASE_URL: postgresql://dronesim:${DB_PASSWORD}@db:5432/dronesim
     command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8098
@@ -50,7 +51,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: .env
     command: celery -A dronesim worker --loglevel=INFO
+    environment:
+      DATABASE_URL: postgresql://dronesim:${DB_PASSWORD}@db:5432/dronesim
     depends_on:
       db:
         condition: service_healthy
