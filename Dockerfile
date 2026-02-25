@@ -1,30 +1,30 @@
 FROM python:3.11-slim-bookworm
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Create and set work directory
 ENV HOME=/app
-RUN mkdir $HOME
-RUN mkdir $HOME/staticfiles
 WORKDIR $HOME
 
-# Install system dependencies
-#RUN apt-get update && apt-get install -y netcat-traditional
-RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
 RUN pip install --upgrade pip
+
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-# copy entrypoint.sh
-COPY ./entrypoint.sh .
-RUN sed -i 's/\r$//g' /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY ./entrypoint.sh /app/entrypoint.sh
+RUN sed -i 's/\r$//g' /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
-# Copy project
 COPY . /app/
+
+# Non-root user
+RUN useradd -m -u 10001 appuser \
+  && mkdir -p /app/staticfiles /var/log/dronesim \
+  && chown -R appuser:appuser /app /var/log/dronesim
+
+USER appuser
 
 ENTRYPOINT ["/app/entrypoint.sh"]

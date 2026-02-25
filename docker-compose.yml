@@ -1,54 +1,68 @@
 services:
-
-  celery:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    command: celery -A dronesim worker
-    volumes:
-      - .:/app
-    env_file:
-      - ./env.prod
-    depends_on:
-      - web
-      - db
-      - redis
-
-  redis:
-    image: redis:latest
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-
   db:
-    image: postgres:18
+    image: postgres:18.2
+    environment:
+      POSTGRES_DB: dronesim
+      POSTGRES_USER: dronesim
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pg_data:/var/lib/postgresql
-    env_file:
-      - ./env.prod
-#    environment:
-#      POSTGRES_DB: dronesim
-#      POSTGRES_USER: dronesim
-#      POSTGRES_PASSWORD: 23kjhrb32ouriz2gr3p2zrgro2zu3brhv1209
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1 -p 5432"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8.6
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://dronesim:${DB_PASSWORD}@db:5432/dronesim
     command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8098
     ports:
       - "127.0.0.1:8098:8098"
     volumes:
       - static_volume:/app/staticfiles
       - dronesim_logs:/var/log/dronesim
-    env_file:
-      - ./env.prod
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    init: true
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A dronesim worker --loglevel=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+    restart: unless-stopped
+    init: true
 
 volumes:
   pg_data:
-  static_volume:
   redis_data:
+  static_volume:
   dronesim_logs:
