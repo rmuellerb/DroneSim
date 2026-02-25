@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim-buster
+FROM python:3.11-slim-bookworm
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -11,7 +11,8 @@ RUN mkdir $HOME/staticfiles
 WORKDIR $HOME
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y netcat
+#RUN apt-get update && apt-get install -y netcat-traditional
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
 RUN pip install --upgrade pip

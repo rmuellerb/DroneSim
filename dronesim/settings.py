@@ -19,8 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'QKEAxp8Cn1wOT01uMKTknM0foGYwlGpFF4m8bDvDVQg3I9Ct5G7GhqwgJkq/IdXoHV5hstU4b/z0ZcCpOJTsvZ3YLvKCIdgISlZta0cXxoQ='
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = bool(os.environ.get('DEBUG', default=0))
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(" ")
+DEBUG = os.environ.get("DEBUG", "0").lower() in ("1", "true", "yes", "on")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").replace(",", " ").split()
 
 # Application definition
 INSTALLED_APPS = [
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -118,7 +119,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Security
 #CSRF_COOKIE_SECURE = True
 #SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_ORIGINS', '127.0.0.1').split(" ")
+CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_ORIGINS", "").replace(",", " ").split()
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 
 # Auth
 LOGIN_REDIRECT_URL = "/"
@@ -165,7 +169,6 @@ REST_FRAMEWORK= {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
 
     ),

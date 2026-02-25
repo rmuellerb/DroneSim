@@ -1,6 +1,3 @@
-# syntax=docker/dockerfile:1
-version: '3.8'
-
 services:
 
   celery:
@@ -19,38 +16,28 @@ services:
 
   redis:
     image: redis:latest
-    ports:
-      - "6379:6379"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
 
-  nginx:
-    build: ./nginx
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - static_volume:/app/staticfiles
-    depends_on:
-      - web
-
   db:
-    image: postgres
+    image: postgres:18
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql
     env_file:
       - ./env.prod
-    ports:
-      - "5432:5432"
+#    environment:
+#      POSTGRES_DB: dronesim
+#      POSTGRES_USER: dronesim
+#      POSTGRES_PASSWORD: 23kjhrb32ouriz2gr3p2zrgro2zu3brhv1209
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8000
-    expose:
-      - "8000"
+    command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8098
+    ports:
+      - "127.0.0.1:8098:8098"
     volumes:
       - static_volume:/app/staticfiles
       - dronesim_logs:/var/log/dronesim
@@ -61,7 +48,7 @@ services:
       - redis
 
 volumes:
-  postgres_data:
+  pg_data:
   static_volume:
   redis_data:
   dronesim_logs:
