@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.views.generic import RedirectView
 from rest_framework import routers, permissions
 from simulator import views as simulator_views
 from simulator.views import login_redirect
@@ -46,19 +47,18 @@ router.register(r'dronetypes', simulator_views.DroneTypeViewSet)
 
 urlpatterns = [
         path('', simulator_views.index, name="index"),
-        #path('register/', simulator_views.register, name='register'),
         path('simulator/', include('simulator.urls'), name="simulator"),
         path('admin/', admin.site.urls),
         path('api/', include(router.urls)),
         path('api/<int:drone_id>/dynamics/', simulator_views.DroneDynamicListAPIView.as_view()),
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-        #path('accounts/', include('django.contrib.auth.urls')),
         path("accounts/login/", login_redirect, name="account_login"),
         path("accounts/", include("allauth.urls")),
         path("api/auth/", include("dj_rest_auth.urls")),
         re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
         path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
         path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+        path("favicon.ico", RedirectView.as_view(url="/static/simulator/favicon.ico", permanent=True)),
 ]
 
 #urlpatterns = format_suffix_patterns(urlpatterns)
