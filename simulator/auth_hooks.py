@@ -2,6 +2,7 @@
 import logging
 import os
 
+from django.contrib.auth import login
 from django.contrib.auth.models import Group
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
@@ -94,5 +95,4 @@ def on_social_updated(sender, request, sociallogin, **kwargs):
 
 @receiver(user_logged_in)
 def on_user_logged_in(sender, request, user, **kwargs):
-    # wichtig: garantiert “bei jedem Login”
     sync_from_socialaccount(user)

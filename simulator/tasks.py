@@ -1,6 +1,7 @@
 from celery import shared_task
 from dronesim.celery import app
 from django.utils import timezone 
+from django.db import transaction
 from simulator.models import Drone, DroneType, DroneDynamics
 from datetime import datetime, timedelta
 import time
@@ -11,7 +12,9 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
+BATCH_SIZE = 5000
+
+def create_initial_drone_dynamics(drone, place_id=-1, timestamp=None):
     """
     Creates an initial drone dynamics orm object. If the place_id is -1, a random place is chosen
     """
@@ -29,6 +32,8 @@ def create_initial_drone_dynamics(drone, place_id=-1, timestamp=timezone.now()):
             ("Darmstadt Mathildenhöhe", 49.870867000, 8.655013000),
             )
     place = random.choice(places)
+    if timestamp is None:
+        timestamp = timezone.now()
     if place_id != -1:
         place = places[place_id]
     return DroneDynamics(drone=drone, speed=drone.dronetype.max_speed, align_roll=0.0, align_pitch=0.0, align_yaw=0.0, longitude=place[2], latitude=place[1], battery_status=drone.dronetype.battery_capacity, last_seen=timestamp, timestamp=timestamp, status = "ON")
@@ -57,7 +62,7 @@ def calculate_new_coordinates(longitude, latitude, speed, heading, last_sighting
     """
     new_lat = math.degrees(new_lat)
     new_long = math.degrees(new_long)
-    print("New long/lat: {} / {} ".format(new_long, new_lat))
+    #print("New long/lat: {} / {} ".format(new_long, new_lat))
     return new_long, new_lat
 
 def calculate_new_battery_level(dynamics, flight_duration_hr):
@@ -76,7 +81,9 @@ def create_serial_number(dronetype):
     return '-'.join([name, year, serial])
 
 # TODO: We assume that an empty battery is reloaded after being offline for 1hr
-def simulate_dynamics(dynamics, yaw=-1, timestamp=timezone.now()):
+def simulate_dynamics(dynamics, yaw=-1, timestamp=None):
+    if timestamp is None:
+        timestamp = timezone.now()
     if dynamics.battery_status <= 0:
         if timestamp - dynamics.last_seen >= timedelta(hours=1):
             dynamics.battery_status = dynamics.drone.dronetype.battery_capacity
@@ -123,6 +130,9 @@ def init_static_drones(init_delta_min=2880, tick_delta_sec=60, n=30):
             DroneType(manufacturer="Potensic", typename="D80", weight=450, max_speed=50, battery_capacity=2800, control_range=800, max_carriage=200),
             DroneType(manufacturer="Contixo", typename="F24 Pro", weight=520, max_speed=60, battery_capacity=2500, control_range=1200, max_carriage=250),
             ]
+    DroneType.objects.bulk_create(dronetypes)
+    dronetypes = list(DroneType.objects.order_by('id')[:n])
+
     drones = []
     for i in range(n):
         dronetype = random.choice(dronetypes)
@@ -133,6 +143,38 @@ def init_static_drones(init_delta_min=2880, tick_delta_sec=60, n=30):
             carriage_weight = random.randint(0, dronetype.max_carriage)
         drone = Drone(dronetype=dronetype, serialnumber=serialnumber, carriage_weight=carriage_weight, carriage_type=carriage_type)
         drones.append(drone)
+    Drone.objects.bulk_create(drones)
+    drones = list(Drone.objects.order_by('id')[:n])
+    
+    """
+    init_delta = timedelta(minutes=init_delta_min)
+    tick_delta = timedelta(seconds=tick_delta_sec)
+    start_time = timezone.now() - init_delta
+    steps = int(init_delta.total_seconds() / tick_delta.total_seconds())
+    
+    current_dyn = [
+        create_initial_drone_dynamics(drone, timestamp=start_time)
+        for drone in drones
+    ]
+    DroneDynamics.objects.bulk_create(current_dyn, batch_size=BATCH_SIZE)
+    batch = []
+    simulated_time = start_time
+    for _ in range(steps):
+        simulated_time += tick_delta
+        current_dyn = [
+            simulate_dynamics(dyn, timestamp=simulated_time)
+            for dyn in current_dyn
+        ]
+        batch.extend(current_dyn)
+
+        if len(batch) >= BATCH_SIZE:
+            with transaction.atomic():
+                DroneDynamics.objects.bulk_create(batch, batch_size=BATCH_SIZE)
+            batch.clear()
+    if batch:
+        with transaction.atomic():
+            DroneDynamics.objects.bulk_create(batch, batch_size=BATCH_SIZE)
+    """
 
     # Creating dynamics for the past x minutes
     init_delta = timedelta(minutes=init_delta_min)
@@ -141,10 +183,6 @@ def init_static_drones(init_delta_min=2880, tick_delta_sec=60, n=30):
     starttime = timezone.now() - init_delta
     dronedynamics = [create_initial_drone_dynamics(drones[i], -1, timestamp=starttime) for i in range(len(drones))]
 
-    for i in dronetypes:
-        i.save()
-    for i in drones:
-        i.save()
     for i in dronedynamics:
         i.save()
     for i in range(int(init_delta/recurring_delta)):

@@ -44,7 +44,7 @@
 </table>
 <br>
 
-{% if user.is_superuser %}
+{% if user.is_staff %}
 <div>
     <h2>Menu</h2>
     <form action="{% url 'simulator:init' %}" method="post">

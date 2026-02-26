@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from rest_framework import viewsets, permissions, generics
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
@@ -107,7 +107,7 @@ def index(request):
     context['modechooseform'] = modechooseform
     return render(request, 'simulator/index.html', context)
 
-@login_required
+@staff_member_required
 def flush(request):
     if request.user.is_superuser:
         DroneType.objects.all().delete()
@@ -116,16 +116,6 @@ def flush(request):
     else:
         log.debug("Flush database not allowed")
         return HttpResponse("Not allowed")
-
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('login')
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
 
 @login_required
 def drones(request):
@@ -154,7 +144,7 @@ def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
     return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
 
-@login_required
+@staff_member_required
 def init(request):
     if Drone.objects.count() > 0:
         log.error("Error initializing database: already initialized. Flush entries to reinizialize.")
