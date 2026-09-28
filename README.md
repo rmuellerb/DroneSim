@@ -88,6 +88,23 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 
 - **SSL/TLS**: if you want to use SSL/TLS, create your certifciate and configure them in the nginx/ directory. Remember to put the certificates in the directory and tell Dockerfile to copy them. Self-signed certificates may introduce issues when interacting with the API if not configured properly, so consider using a service such as letsencrypt.
 
+## Example .env file
+DEBUG=0
+SECRET_KEY=xyz
+DB_PASSWORD=xyz
+DJANGO_ALLOWED_HOSTS=dronesim.example.com
+DJANGO_CSRF_ORIGINS=https://dronesim.example.com
+DJANGO_LOG_LEVEL=WARNING
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+OIDC_PROVIDER_ID=authentik
+OIDC_NAME=Authentik
+OIDC_CLIENT_ID=xyz
+OIDC_CLIENT_SECRET=xyz
+OIDC_SERVER_URL=https://auth.example.com
+PUBLIC_DOMAIN=dronesim.example.com
+PUBLIC_SITE_NAME=DroneSim
+
 ## Contribution
 
 1. Fork the project
