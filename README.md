@@ -89,6 +89,7 @@ IMPORTANT: The following installation instruction is outdated, as the project no
 - **SSL/TLS**: if you want to use SSL/TLS, create your certifciate and configure them in the nginx/ directory. Remember to put the certificates in the directory and tell Dockerfile to copy them. Self-signed certificates may introduce issues when interacting with the API if not configured properly, so consider using a service such as letsencrypt.
 
 ## Example .env file
+   ```sh
 DEBUG=0
 SECRET_KEY=xyz
 DB_PASSWORD=xyz
@@ -104,6 +105,7 @@ OIDC_CLIENT_SECRET=xyz
 OIDC_SERVER_URL=https://auth.example.com
 PUBLIC_DOMAIN=dronesim.example.com
 PUBLIC_SITE_NAME=DroneSim
+   ```
 
 ## Contribution
 
