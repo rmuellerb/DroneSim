@@ -494,5 +494,4 @@ def init_static_drones(init_delta_min=2880, tick_delta_sec=60, n=30):
         with transaction.atomic():
             DroneDynamics.objects.bulk_create(batch, batch_size=BATCH_SIZE)
 
-    log.info("Initialisierung abgeschlossen: %d Drohnen, %d Ticks, %d Datensaetze",
-             len(drones), steps, len(drones) * (steps + 1))
+    log.info("Init succeeded! %d drones, %d ticks, %d datasets", len(drones), steps, len(drones) * (steps + 1))
