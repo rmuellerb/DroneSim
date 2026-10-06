@@ -33,7 +33,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://dronesim:${DB_PASSWORD}@db:5432/dronesim
-    command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8098
+    command: gunicorn dronesim.wsgi:application --bind 0.0.0.0:8098 --no-control-socket --workers 3 --timeout 60
     ports:
       - "127.0.0.1:8098:8098"
     volumes:

@@ -90,8 +90,6 @@ def create_context(request):
     return context
 
 # Views
-@require_POST
-@staff_member_required
 def index(request):
     latest = (DroneDynamics.objects.filter(drone=OuterRef("pk")).order_by("-timestamp", "-id"))
     drones = (Drone.objects.select_related("dronetype").annotate(last_status=Subquery(latest.values("status")[:1]), last_timestamp=Subquery(latest.values("timestamp")[:1])))
@@ -133,6 +131,7 @@ def dynamics(request, drone_id):
     drone = get_object_or_404(Drone, pk=drone_id)
     return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
 
+@require_POST
 @staff_member_required
 def init(request):
     if Drone.objects.count() > 0:
