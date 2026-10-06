@@ -93,7 +93,6 @@ def create_context(request):
 def index(request):
     latest = (DroneDynamics.objects.filter(drone=OuterRef("pk")).order_by("-timestamp", "-id"))
     drones = (Drone.objects.select_related("dronetype").annotate(last_status=Subquery(latest.values("status")[:1]), last_timestamp=Subquery(latest.values("timestamp")[:1])))
-    drones = Drone.objects.all()
     context = create_context(request)
     context['drones'] = drones
     return render(request, 'simulator/index.html', context)
