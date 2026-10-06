@@ -38,11 +38,6 @@ def drone_id_from_url(url):
 
 
 def make_fleet(n_drones=3, n_ticks=5):
-    """
-    Legt n_drones Drohnen mit je n_ticks Datensaetzen an. Alle Drohnen teilen
-    sich dieselben Zeitstempel - genau wie bei init_static_drones. Das ist der
-    Fall, in dem eine Sortierung nur nach timestamp nicht eindeutig ist.
-    """
     dronetype = DroneType.objects.create(
         manufacturer="TestCorp", typename="T1", weight=1000, max_speed=50,
         battery_capacity=5000, control_range=1000, max_carriage=200,
@@ -61,8 +56,6 @@ def make_fleet(n_drones=3, n_ticks=5):
                 longitude="8.682127000", latitude="50.110924000",
                 battery_status=4000, status=DroneDynamics.STATUS_ONLINE,
             ))
-    # Einfuegen in umgekehrter Reihenfolge, damit die Tabellenreihenfolge
-    # nicht zufaellig schon der erwarteten Sortierung entspricht.
     DroneDynamics.objects.bulk_create(reversed(rows))
     return drones
 
@@ -83,17 +76,18 @@ class ApiAuthTests(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
         self.assertEqual(self.client.get("/api/drones/").status_code, 200)
 
-    def test_students_cannot_write(self):
-        user = User.objects.create_user("student", password="x")
-        self.client.force_authenticate(user)
+    def test_api_is_read_only(self):
         drone = Drone.objects.first()
-        self.assertEqual(self.client.post("/api/dronetypes/", {}).status_code, 403)
-        self.assertEqual(self.client.delete(f"/api/drones/{drone.pk}/").status_code, 403)
+        users = [User.objects.create_user("student", password="x"),
+                 User.objects.create_superuser("admin", password="x")]
+        for user in users:
+            with self.subTest(user=user.username):
+                self.client.force_authenticate(user)
+                self.assertEqual(self.client.post("/api/dronetypes/", {}).status_code, 405)
+                self.assertEqual(self.client.delete(f"/api/drones/{drone.pk}/").status_code, 405)
         self.assertTrue(Drone.objects.filter(pk=drone.pk).exists())
 
-
 class ApiContractTests(TestCase):
-    """Feldnamen und Paging-Struktur, wie sie in der Projektbeschreibung stehen."""
 
     def setUp(self):
         self.drones = make_fleet()
@@ -122,7 +116,6 @@ class ApiContractTests(TestCase):
 
 
 class ApiLimitTests(TestCase):
-    """max_limit schuetzt den Server vor ?limit=100000 (ein Request, alle Daten)."""
 
     def setUp(self):
         make_fleet(n_drones=11, n_ticks=100)  # 1100 Datensaetze, mehr als max_limit
@@ -141,10 +134,6 @@ class ApiLimitTests(TestCase):
 
 
 class ApiOrderingTests(TestCase):
-    """
-    Durchblaettern per limit/offset muss jeden Datensatz genau einmal liefern,
-    auch wenn mehrere Drohnen denselben Zeitstempel haben.
-    """
 
     def setUp(self):
         self.drones = make_fleet(n_drones=4, n_ticks=6)  # 24 Datensaetze
@@ -176,7 +165,6 @@ class ApiOrderingTests(TestCase):
 
 
 class AdminActionTests(TestCase):
-    """init und flush duerfen nur per POST und nur mit den richtigen Rechten laufen."""
 
     def setUp(self):
         make_fleet()
@@ -220,10 +208,6 @@ class AdminActionTests(TestCase):
 
 
 class QueryCountTests(TestCase):
-    """
-    Die Zahl der Queries darf nicht mit der Zahl der Drohnen bzw. Zeilen wachsen.
-    Gemessen wird bei kleiner und grosser Flotte; beide Werte muessen gleich sein.
-    """
 
     def count_queries(self, url, n_drones, login=True):
         DroneType.objects.all().delete()
@@ -247,10 +231,9 @@ class QueryCountTests(TestCase):
 
 
 class DronePageTests(TestCase):
-    """/simulator/<id>/dynamics: paginiert, konstante Queries, nur mit Login."""
 
     def setUp(self):
-        self.drone = make_fleet(n_drones=1, n_ticks=120)[0]  # 120 Datensaetze
+        self.drone = make_fleet(n_drones=1, n_ticks=120)[0] 
         self.url = reverse("simulator:dynamics", args=[self.drone.pk])
         self.client.force_login(User.objects.create_user("student", password="x"))
 
