@@ -4,10 +4,9 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
-from rest_framework import viewsets, permissions, generics
+from rest_framework import viewsets, generics
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics
-from rest_framework.response import Response
 from .tasks import init_static_drones
 from rest_framework.authtoken.models import Token
 from django.db.models import OuterRef, Subquery
@@ -115,7 +114,7 @@ def init(request):
     if Drone.objects.count() > 0:
         log.error("Error initializing database: already initialized. Flush entries to reinizialize.")
         return HttpResponse("Error initializing database: already initialized. Flush entries to reinitialize.")
-    init_call = init_static_drones.delay()
+    init_static_drones.delay()
     log.debug("Started background task to initialize drones")
     return HttpResponse("Started background task to initialize drones")
 

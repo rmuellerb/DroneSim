@@ -20,10 +20,6 @@ from django.views.generic import RedirectView
 from rest_framework import routers, permissions
 from simulator import views as simulator_views
 from simulator.views import login_redirect
-from rest_framework.urlpatterns import format_suffix_patterns
-from django.contrib.auth import views as auth_views
-from django.views.generic import TemplateView
-from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
