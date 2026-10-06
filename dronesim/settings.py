@@ -100,6 +100,16 @@ celery_broker_url = os.environ.get("CELERY_BROKER_URL")
 celery_result_backend = os.environ.get("CELERY_RESULT_BACKEND")
 celery_broker_connection_retry_on_startup = True
 
+# Cache
+REDIS_CACHE_URL = os.environ.get("REDIS_CACHE_URL")
+if REDIS_CACHE_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_CACHE_URL,
+        }
+    }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -132,8 +142,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Security
-#CSRF_COOKIE_SECURE = True
-#SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_ORIGINS", "").replace(",", " ").split()
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

@@ -98,6 +98,7 @@ DJANGO_CSRF_ORIGINS=https://dronesim.example.com
 DJANGO_LOG_LEVEL=WARNING
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
+REDIS_CACHE_URL=redis://redis:6379/1
 OIDC_PROVIDER_ID=authentik
 OIDC_NAME=Authentik
 OIDC_CLIENT_ID=xyz

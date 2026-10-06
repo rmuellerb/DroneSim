@@ -228,7 +228,6 @@ class QueryCountTests(TestCase):
 
 
 class SimulationTests(TestCase):
-    """Init-Task mit kleinem Datenbestand, wird synchron ohne Celery ausgefuehrt."""
 
     def test_init_static_drones(self):
         init_static_drones(init_delta_min=10, tick_delta_sec=60, n=3)
