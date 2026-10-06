@@ -57,7 +57,7 @@ class DroneDynamicsViewSet(viewsets.ModelViewSet):
     """
     API endpoint for drone dynamics information
     """
-    queryset = DroneDynamics.objects.all().order_by('timestamp')
+    queryset = DroneDynamics.objects.all().order_by('timestamp', "id")
     serializer_class = DroneDynamicsSerializer
     permission_classes = [IsAuthenticatedOrSuperuser]
 
@@ -122,11 +122,10 @@ def dronetypes(request):
 @login_required
 def dronedynamics(request):
     context = create_context(request)
-    dronedynamics_list = DroneDynamics.objects.all()
+    dronedynamics_list = (DroneDynamics.objects.select_related("drone").order_by("timestamp", "id"))
     paginator = Paginator(dronedynamics_list, 10)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context['page_obj'] = page_obj
+    context['page_obj'] = paginator.get_page(page_number)
     return render(request, 'simulator/dronedynamics.html', context)
 
 @login_required

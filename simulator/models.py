@@ -41,6 +41,8 @@ class Drone(models.Model):
     carriage_type = models.CharField(max_length=3, choices=CARRIAGE_CHOICES, default=CARRIAGE_NOTHING, help_text="Type of carriage. SEN for sensor, ACT for actuator, and NOT for nothing.")
 
 class DroneDynamics(models.Model):
+    class Meta:
+        indexes = [models.Index(fields=["timestamp", "id"])]
     def __str__(self):
         return "[{}] Status: {}, coordinates: {}/{}, speed: {}/{}, battery: {}/{}".format(self.timestamp, self.status, self.longitude, self.latitude, self.speed, self.drone.dronetype.max_speed, self.battery_status, self.drone.dronetype.battery_capacity)
     
