@@ -38,6 +38,11 @@ def drone_id_from_url(url):
 
 
 def make_fleet(n_drones=3, n_ticks=5):
+    """
+    Create n_drones drones with n_ticks dynamics each.
+    All drones intentionally share the same timestamps (like init_static_drones),
+    which is exactly the case where ordering by timestamp alone is ambiguous.
+    """
     dronetype = DroneType.objects.create(
         manufacturer="TestCorp", typename="T1", weight=1000, max_speed=50,
         battery_capacity=5000, control_range=1000, max_carriage=200,
@@ -56,6 +61,8 @@ def make_fleet(n_drones=3, n_ticks=5):
                 longitude="8.682127000", latitude="50.110924000",
                 battery_status=4000, status=DroneDynamics.STATUS_ONLINE,
             ))
+    # Insert in reverse order on purpose, so the database cannot return
+    # the expected order by accident. Do not "simplify" this.
     DroneDynamics.objects.bulk_create(reversed(rows))
     return drones
 
