@@ -10,9 +10,6 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
 
-class SimulatorSettings(models.Model):
-    mode = models.CharField(max_length=10, choices=[('static', 'Static'), ('live', 'Live')])
-
 class DroneType(models.Model):
     def __str__(self):
         return self.manufacturer + ": " + self.typename

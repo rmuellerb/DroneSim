@@ -1,13 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from rest_framework import viewsets, permissions, generics
 from simulator.serializers import DroneSerializer, DroneTypeSerializer, DroneDynamicsSerializer
 from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
-from .forms import ModeChooseForm
 from .tasks import init_static_drones
 from rest_framework.authtoken.models import Token
 import logging
@@ -89,33 +89,20 @@ def create_context(request):
     return context
 
 # Views
+@require_POST
+@staff_member_required
 def index(request):
-    modechooseform = ModeChooseForm(request.POST or None)
-    if modechooseform.is_valid():
-        mode = modechooseform.cleaned_data['simulator_mode']
-        settings, created = SimulatorSettings.objects.get_or_create(pk=1)
-        if settings.mode != mode:
-            log.debug("Changed mode from \'{}\' to \'{}\'".format(settings.mode, mode))
-            settings.mode = mode
-            settings.save()
-            return HttpResponse('Changed mode successfully to \'{}\''.format(mode))
-        log.debug("Settings not changed")
-        return HttpResponse('Mode remains unchancged at \'{}\''.format(mode))
     drones = Drone.objects.all()
     context = create_context(request)
     context['drones'] = drones
-    context['modechooseform'] = modechooseform
     return render(request, 'simulator/index.html', context)
 
-@staff_member_required
+@require_POST
+@user_passes_test(lambda u: u.is_superuser)
 def flush(request):
-    if request.user.is_superuser:
-        DroneType.objects.all().delete()
-        log.debug("Deleted database entries")
-        return HttpResponse("Successful deleted database entries")
-    else:
-        log.debug("Flush database not allowed")
-        return HttpResponse("Not allowed")
+    DroneType.objects.all().delete()
+    log.info("Deleted database entries from user %s", request.user)
+    return HttpResponse("Successful deleted database entries")
 
 @login_required
 def drones(request):
