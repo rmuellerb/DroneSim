@@ -22,13 +22,8 @@
         <td>{{drone.dronetype.typename}}</td>
         <td>{{drone.serialnumber}}</td>
         <td>{{drone.created}}</td>
-        {% if drone.dynamics.last %}
-        <td>{{drone.dynamics.last.status}}</td>
-        <td>{{drone.dynamics.last.timestamp}}</td>
-        {% else %}
-        <td>-</td>
-        <td>-</td>
-        {% endif %}
+        <td>{{drone.last_status|default:"-"}}</td>
+        <td>{{drone.last_timestamp|default:"-"}}</td>
     </tr>
     {% empty %}
     <tr>

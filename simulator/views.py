@@ -10,6 +10,7 @@ from simulator.models import Drone, DroneType, DroneDynamics, SimulatorSettings
 from rest_framework.response import Response
 from .tasks import init_static_drones
 from rest_framework.authtoken.models import Token
+from django.db.models import OuterRef, Subquery
 import logging
 
 log = logging.getLogger(__name__)
@@ -92,6 +93,8 @@ def create_context(request):
 @require_POST
 @staff_member_required
 def index(request):
+    latest = (DroneDynamics.objects.filter(drone=OuterRef("pk")).order_by("-timestamp", "-id"))
+    drones = (Drone.objects.select_related("dronetype").annotate(last_status=Subquery(latest.values("status")[:1]), last_timestamp=Subquery(latest.values("timestamp")[:1])))
     drones = Drone.objects.all()
     context = create_context(request)
     context['drones'] = drones
