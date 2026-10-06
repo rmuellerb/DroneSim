@@ -40,9 +40,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.openid_connect',
-    # optional
-    #'dj_rest_auth',
-    #'dj_rest_auth.registration',
     # DroneSim
     'simulator.apps.SimulatorConfig',
 ]
