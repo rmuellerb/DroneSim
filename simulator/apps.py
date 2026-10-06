@@ -8,5 +8,5 @@ class SimulatorConfig(AppConfig):
     name = 'simulator'
 
     def ready(self):
-        import simulator.auth_hooks
+        import simulator.auth_hooks # noqa: F401
         logger.warning("SimulatorConfig.ready() loaded auth_hooks")
