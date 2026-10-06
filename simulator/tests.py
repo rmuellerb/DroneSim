@@ -121,6 +121,25 @@ class ApiContractTests(TestCase):
         self.assertEqual(self.client.get("/api/999999/dynamics/").status_code, 404)
 
 
+class ApiLimitTests(TestCase):
+    """max_limit schuetzt den Server vor ?limit=100000 (ein Request, alle Daten)."""
+
+    def setUp(self):
+        make_fleet(n_drones=11, n_ticks=100)  # 1100 Datensaetze, mehr als max_limit
+        self.client = APIClient()
+        self.client.force_authenticate(User.objects.create_user("student", password="x"))
+
+    def test_limit_is_capped(self):
+        data = self.client.get("/api/dronedynamics/?format=json&limit=100000").json()
+        self.assertEqual(len(data["results"]), 1000)
+        self.assertIsNotNone(data["next"])  # Rest bleibt per Paging erreichbar
+        self.assertEqual(data["count"], 1100)
+
+    def test_limit_below_cap_is_respected(self):
+        data = self.client.get("/api/dronedynamics/?format=json&limit=25").json()
+        self.assertEqual(len(data["results"]), 25)
+
+
 class ApiOrderingTests(TestCase):
     """
     Durchblaettern per limit/offset muss jeden Datensatz genau einmal liefern,
@@ -225,6 +244,44 @@ class QueryCountTests(TestCase):
         small = self.count_queries(url, n_drones=2)
         large = self.count_queries(url, n_drones=20)
         self.assertEqual(small, large)
+
+
+class DronePageTests(TestCase):
+    """/simulator/<id>/dynamics: paginiert, konstante Queries, nur mit Login."""
+
+    def setUp(self):
+        self.drone = make_fleet(n_drones=1, n_ticks=120)[0]  # 120 Datensaetze
+        self.url = reverse("simulator:dynamics", args=[self.drone.pk])
+        self.client.force_login(User.objects.create_user("student", password="x"))
+
+    def test_requires_login(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(self.url).status_code, 302)
+
+    def test_unknown_drone_returns_404(self):
+        url = reverse("simulator:dynamics", args=[999999])
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_is_paginated(self):
+        response = self.client.get(self.url)
+        page = response.context["page_obj"]
+        self.assertEqual(len(page.object_list), 50)
+        self.assertEqual(page.paginator.num_pages, 3)  # 50 + 50 + 20
+
+    def test_pages_are_ordered_and_complete(self):
+        seen = []
+        for number in (1, 2, 3):
+            page = self.client.get(self.url, {"page": number}).context["page_obj"]
+            seen.extend(dyn.pk for dyn in page.object_list)
+        expected = list(self.drone.dynamics.order_by("timestamp", "id")
+                        .values_list("pk", flat=True))
+        self.assertEqual(seen, expected)
+
+    def test_query_count_does_not_grow_with_page_size(self):
+        with CaptureQueriesContext(connection) as ctx:
+            self.client.get(self.url)
+        # Session/User, Token, Drohne+Typ, COUNT, Seite - unabhaengig von 50 Zeilen
+        self.assertLessEqual(len(ctx.captured_queries), 6)
 
 
 class SimulationTests(TestCase):

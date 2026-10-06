@@ -1,6 +1,5 @@
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+{% extends "simulator/base.html" %}
+{% block content %}
 <h1>Details for {{ drone }} </h1>
 <table>
     <tr>
@@ -14,17 +13,17 @@
         <th>Position (lon/lat)</th>
         <th>Battery</th>
     </tr>
-    {% for dyn in dynamics %}
+    {% for dyn in page_obj %}
     <tr>
         <td>{{dyn.timestamp}}</td>
         <td>{{dyn.last_seen}}</td>
         <td>{{dyn.status}}</td>
-        <td>{{dyn.speed}}/{{dyn.drone.dronetype.max_speed}} km/h</td>
+        <td>{{dyn.speed}}/{{drone.dronetype.max_speed}} km/h</td>
         <td>{{dyn.align_roll}}</td>
         <td>{{dyn.align_pitch}}</td>
         <td>{{dyn.align_yaw}}</td>
         <td>({{dyn.longitude}})({{dyn.latitude}})</td>
-        <td>{{dyn.battery_status}}/{{dyn.drone.dronetype.battery_capacity}}</td>
+        <td>{{dyn.battery_status}}/{{drone.dronetype.battery_capacity}}</td>
     </tr>
     {% empty %}
     <tr>
@@ -40,4 +39,5 @@
     </tr>
     {% endfor %}
 </table>
-<br>
+{% include "simulator/_pagination.html" %}
+{% endblock %}

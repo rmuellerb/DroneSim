@@ -147,6 +147,12 @@ SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_ORIGINS", "").replace(",", " ").split()
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# HTTP->HTTPS-Weiterleitung uebernimmt Caddy; gunicorn lauscht nur auf
+# 127.0.0.1 und ist von aussen nicht direkt erreichbar. Eine zusaetzliche
+# Weiterleitung in Django wuerde nur interne Aufrufe (Healthchecks, Tests)
+# ueber http:// brechen.
+SILENCED_SYSTEM_CHECKS = ["security.W008"]
 USE_X_FORWARDED_HOST = True
 
 # Auth

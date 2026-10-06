@@ -102,8 +102,12 @@ def dronedynamics(request):
 
 @login_required
 def dynamics(request, drone_id):
-    drone = get_object_or_404(Drone, pk=drone_id)
-    return render(request, 'simulator/dynamics.html', {'dynamics': drone.dynamics.all(), 'drone': drone})
+    drone = get_object_or_404(Drone.objects.select_related("dronetype"), pk=drone_id)
+    paginator = Paginator(drone.dynamics.order_by("timestamp", "id"), 50)
+    context = create_context(request)
+    context["drone"] = drone
+    context["page_obj"] = paginator.get_page(request.GET.get("page"))
+    return render(request, "simulator/dynamics.html", context)
 
 @require_POST
 @staff_member_required
