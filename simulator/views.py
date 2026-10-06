@@ -37,7 +37,7 @@ class IsSuperUserOrReadOnly(permissions.BasePermission):
         return request.user and request.user.is_superuser
 
 # REST API views
-class DroneViewSet(viewsets.ModelViewSet):
+class DroneViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for drones
     """
@@ -45,7 +45,7 @@ class DroneViewSet(viewsets.ModelViewSet):
     serializer_class = DroneSerializer
     permission_classes = [IsAuthenticatedOrSuperuser]
 
-class DroneTypeViewSet(viewsets.ModelViewSet):
+class DroneTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for dronetypes
     """
@@ -53,7 +53,7 @@ class DroneTypeViewSet(viewsets.ModelViewSet):
     serializer_class = DroneTypeSerializer
     permission_classes = [IsAuthenticatedOrSuperuser]
 
-class DroneDynamicsViewSet(viewsets.ModelViewSet):
+class DroneDynamicsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for drone dynamics information
     """
