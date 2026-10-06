@@ -205,6 +205,6 @@ REST_FRAMEWORK= {
     'DEFAULT_THROTTLE_RATES': {
         'user': '10000/hour'
     },
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'simulator.pagination.CappedLimitOffsetPagination',
     'PAGE_SIZE': 10,
 }
