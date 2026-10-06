@@ -15,27 +15,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Permissions
-class IsAuthenticatedOrSuperuser(permissions.BasePermission):
-    """
-    Custom permission to allow read-only for authenticated users
-    and write permissions for superusers
-    """
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return request.user and request.user.is_authenticated
-        else:
-            return request.user and request.user.is_superuser
-
-class IsSuperUserOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission to allow read-only for all except superusers
-    """
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return request.user and request.user.is_superuser
-
 # REST API views
 class DroneViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -43,7 +22,6 @@ class DroneViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Drone.objects.all().order_by('created')
     serializer_class = DroneSerializer
-    permission_classes = [IsAuthenticatedOrSuperuser]
 
 class DroneTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -51,7 +29,6 @@ class DroneTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = DroneType.objects.all().order_by('manufacturer')
     serializer_class = DroneTypeSerializer
-    permission_classes = [IsAuthenticatedOrSuperuser]
 
 class DroneDynamicsViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -59,14 +36,12 @@ class DroneDynamicsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = DroneDynamics.objects.all().order_by('timestamp', "id")
     serializer_class = DroneDynamicsSerializer
-    permission_classes = [IsAuthenticatedOrSuperuser]
 
 class DroneDynamicListAPIView(generics.ListAPIView):
     """
     API endpoint for drone dynamics information based on a drone id
     """
     serializer_class = DroneDynamicsSerializer
-    permission_classes = [IsAuthenticatedOrSuperuser]
 
     def get_queryset(self):
         """
